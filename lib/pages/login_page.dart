@@ -25,13 +25,12 @@ class _LoginPageState extends State<LoginPage> {
         body: SafeArea(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 150,
-                ), // 100 -> 50 küçültüldü
-                child: Icon(Icons.shopify, size: 150, color: Colors.white),
+              Expanded(
+                flex: 2,
+                child: Center(
+                  child: Icon(Icons.shopify, size: 150, color: Colors.white),
+                ),
               ),
-              Expanded(flex: 1, child: Spacer()),
               Expanded(
                 flex: 2,
                 // Ekranın geri kalanını kaplaması için eklendi
@@ -47,13 +46,17 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'Kaydol veya giriş yap',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                      Column(
+                        children: [
+                          const Text(
+                            'Kaydol veya giriş yap',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 20),
                       Button(
