@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
-import 'kullanim_kosullari.dart';
-import 'gizlilik_sozlesmesi.dart';
+import 'kullanim_kosullari_page.dart';
+import 'gizlilik_sozlesmesi_page.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.close),
+            color: Colors.white,
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -56,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                           fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      Flexible(child: const SizedBox(height: 20)),
                       Button(
                         icon: Icons.add,
                         text: "Hesap oluştur",
@@ -65,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                         fontSize: 14,
                         onPressed: () {},
                       ),
-                      const SizedBox(height: 10),
+                      Flexible(child: const SizedBox(height: 20)),
                       Button(
                         icon: Icons.mail_outline_outlined,
                         text: "E-posta ile devam et",
@@ -74,59 +70,67 @@ class _LoginPageState extends State<LoginPage> {
                         fontSize: 14,
                         onPressed: () {},
                       ),
-                      const SizedBox(height: 20),
-                      RichText(
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.black,
+                      const SizedBox(height: 10),
+                      Flexible(
+                        child: RichText(
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.black,
+                            ),
+                            children: [
+                              const TextSpan(text: "Devam etmek suretiyle "),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                KullanimKosullariPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Kullanım Koşulları ",
+                                    style: TextStyle(
+                                      color: Colors.blue.shade400,
+                                      decoration: TextDecoration.underline,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const TextSpan(text: "ve "),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                GizlilikSozlesmesiPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Gizlilik Politikamızı ",
+                                    style: TextStyle(
+                                      color: Colors.blue.shade400,
+                                      decoration: TextDecoration.underline,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const TextSpan(text: "kabul etmiş olursunuz."),
+                            ],
                           ),
-                          children: [
-                            const TextSpan(text: "Devam etmek suretiyle "),
-                            WidgetSpan(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => KullanimKosullari(),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  "Kullanım Koşulları ",
-                                  style: TextStyle(
-                                    color: Colors.blue.shade400,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const TextSpan(text: "ve "),
-                            WidgetSpan(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => GizlilikSozlesmesi(),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  "Gizlilik Politikamızı ",
-                                  style: TextStyle(
-                                    color: Colors.blue.shade400,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const TextSpan(text: "kabul etmiş olursunuz."),
-                          ],
                         ),
                       ),
                     ],
