@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
+import 'kullanim_kosullari.dart';
+import 'gizlilik_sozlesmesi.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,6 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -33,7 +36,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Expanded(
                 flex: 2,
-                // Ekranın geri kalanını kaplaması için eklendi
                 child: Container(
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -42,21 +44,17 @@ class _LoginPageState extends State<LoginPage> {
                       topRight: Radius.circular(30),
                     ),
                   ),
-                  padding: const EdgeInsets.all(20), // İç boşluklar ayarlandı
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Column(
-                        children: [
-                          const Text(
-                            'Kaydol veya giriş yap',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        'Kaydol veya giriş yap',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Button(
@@ -87,14 +85,45 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           children: [
                             const TextSpan(text: "Devam etmek suretiyle "),
-                            TextSpan(
-                              style: TextStyle(color: Colors.blue.shade400),
-                              text: "Kullanım Koşulları ",
+                            WidgetSpan(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => KullanimKosullari(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  "Kullanım Koşulları ",
+                                  style: TextStyle(
+                                    color: Colors.blue.shade400,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
                             ),
                             const TextSpan(text: "ve "),
-                            TextSpan(
-                              style: TextStyle(color: Colors.blue.shade400),
-                              text: "Gizlilik Politikamızı ",
+                            WidgetSpan(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => GizlilikSozlesmesi(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  "Gizlilik Politikamızı ",
+                                  style: TextStyle(
+                                    color: Colors.blue.shade400,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
                             ),
                             const TextSpan(text: "kabul etmiş olursunuz."),
                           ],
