@@ -37,7 +37,6 @@ class Button extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               if (icon != null)
                 Icon(icon, color: textColor, size: fontSize * 1.5),
