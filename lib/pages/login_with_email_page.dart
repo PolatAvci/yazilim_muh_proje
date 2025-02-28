@@ -176,14 +176,14 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
             Row(
               children: [
                 Expanded(
-                  child: FilledButton(
+                  child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                         isEmailValid && isPasswordValid
                             ? Colors.blue.shade400
                             : Colors.grey[400],
                       ),
-                      shape: MaterialStateProperty.all(
+                      shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
