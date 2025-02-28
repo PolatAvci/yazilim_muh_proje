@@ -14,6 +14,10 @@ class RegisterPage extends StatelessWidget {
   final _name = TextEditingController();
   final _surname = TextEditingController();
 
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,30 +134,6 @@ class RegisterPage extends StatelessWidget {
                         textColor: Colors.white,
                         fontSize: 13,
                         onPressed: () {
-                          // Validate passwords match
-                          if (_password.text != _repassword.text) {
-                            // Show error if passwords don't match
-                            showDialog(
-                              context: context,
-                              builder:
-                                  (context) => AlertDialog(
-                                    title: Text('Hata'),
-                                    content: Text('Şifreler uyuşmuyor!'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text(
-                                          'Tamam',
-                                          style: TextStyle(color: Colors.blue),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                            );
-                            return;
-                          }
                           if (_password.text.isEmpty ||
                               _email.text.isEmpty ||
                               _name.text.isEmpty ||
@@ -193,6 +173,42 @@ class RegisterPage extends StatelessWidget {
                             );
                             return;
                           }
+
+                          if (!_isValidEmail(_email.text)) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Geçersiz E-posta!"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Validate passwords match
+                          if (_password.text != _repassword.text) {
+                            // Show error if passwords don't match
+                            showDialog(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: Text('Hata'),
+                                    content: Text('Şifreler uyuşmuyor!'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          'Tamam',
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                            );
+                            return;
+                          }
+
                           //Hata yoksa
                           // Create User object
                           User newUser = User(
