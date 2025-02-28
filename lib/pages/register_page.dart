@@ -1,6 +1,9 @@
-import "package:flutter/material.dart";
-import "package:yazilim_muh_proje/components/button.dart";
-import "package:yazilim_muh_proje/components/custom_text_field.dart";
+import 'package:flutter/material.dart';
+import 'package:yazilim_muh_proje/Models/veriler.dart';
+import 'package:yazilim_muh_proje/components/button.dart';
+import 'package:yazilim_muh_proje/components/custom_text_field.dart';
+import 'package:yazilim_muh_proje/Models/user.dart';
+import 'package:yazilim_muh_proje/pages/login_with_email_page.dart';
 
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});
@@ -15,10 +18,7 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-           
-          ],
-        ),
+        title: Row(mainAxisAlignment: MainAxisAlignment.start, children: []),
         backgroundColor: Colors.blue.shade400,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -129,7 +129,43 @@ class RegisterPage extends StatelessWidget {
                         buttonColor: Colors.blue.shade400,
                         textColor: Colors.white,
                         fontSize: 13,
-                        onPressed: () {},
+                        onPressed: () {
+                          // Validate passwords match
+                          if (_password.text == _repassword.text) {
+                            // Create User object
+                            User newUser = User(
+                              email: _email.text,
+                              sifre: _password.text,
+                            );
+                            // Add the new user to the list
+                            Veriler.kullanicilar.add(newUser);
+                            // Navigate to the KullanimKosullariPage
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginWithEmailPage(),
+                              ),
+                            );
+                          } else {
+                            // Show error if passwords don't match
+                            showDialog(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: Text('Hata'),
+                                    content: Text('Şifreler uyuşmuyor!'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text('Tamam'),
+                                      ),
+                                    ],
+                                  ),
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),

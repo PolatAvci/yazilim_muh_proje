@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
 class CustomTextField extends StatefulWidget {
   const CustomTextField({
@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
     required TextEditingController controller,
     required String hint,
   });
+
   final String label;
   final bool password;
   final Function(String) onChanged;
@@ -21,6 +22,7 @@ class CustomTextField extends StatefulWidget {
 
 class _CustomTextFieldState extends State<CustomTextField> {
   bool _obsecure = true;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(

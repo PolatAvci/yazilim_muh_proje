@@ -1,6 +1,9 @@
-import "package:flutter/material.dart";
-import "package:yazilim_muh_proje/components/custom_text_field.dart";
-import "package:yazilim_muh_proje/pages/register_page.dart";
+import 'package:flutter/material.dart';
+import 'package:yazilim_muh_proje/components/custom_text_field.dart';
+import 'package:yazilim_muh_proje/pages/register_page.dart';
+import 'package:yazilim_muh_proje/pages/kullanim_kosullari_page.dart'; // KullanimKosullariPage'yi import et
+import 'package:yazilim_muh_proje/Models/user.dart';
+import 'package:yazilim_muh_proje/Models/veriler.dart'; // Veriler'i import et
 
 class LoginWithEmailPage extends StatefulWidget {
   const LoginWithEmailPage({super.key});
@@ -11,11 +14,15 @@ class LoginWithEmailPage extends StatefulWidget {
 
 class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
   String _inputText = "";
+  String _passwordText = "";
   final _email = TextEditingController();
+  final _password = TextEditingController();
+
   @override
   void dispose() {
     super.dispose();
     _email.dispose();
+    _password.dispose();
   }
 
   Widget _buildErrorText(bool isValid) {
@@ -38,10 +45,9 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
               ),
             ),
           ],
-        ) // Geçerli ise boş bir container döndür
+        )
         : Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //padding: EdgeInsets.only(top: 8.0),
           children: [
             Flexible(
               child: const Text(
@@ -67,11 +73,38 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
         );
   }
 
+  void _login() {
+    bool isEmailValid = _isValidEmail(_inputText);
+    bool isPasswordValid = _passwordText.isNotEmpty;
+
+    if (isEmailValid && isPasswordValid) {
+      // Kullanıcıyı doğrula
+      User user = Veriler.kullanicilar.firstWhere(
+        (user) => user.email == _inputText && user.sifre == _passwordText,
+        orElse:
+            () =>
+                User(email: "", sifre: ""), // Varsayılan bir User döndürüyoruz
+      );
+
+      if (user.email.isNotEmpty) {
+        // Kullanıcı doğrulandı, KullanimKosullariPage'e yönlendir
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => KullanimKosullariPage()),
+        );
+      } else {
+        // Kullanıcı bulunamadı, hata mesajı göster
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Geçersiz e-posta veya şifre")));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isEmailValid = _isValidEmail(
-      _inputText,
-    ); // E-postanın doğruluğunu kontrol et
+    bool isEmailValid = _isValidEmail(_inputText); // E-posta doğrulaması
+    bool isPasswordValid = _passwordText.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,11 +119,14 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
           Padding(
             padding: EdgeInsets.only(right: 20),
             child: TextButton(
-              onPressed: isEmailValid ? () {} : null,
+              onPressed: isEmailValid && isPasswordValid ? _login : null,
               child: Text(
                 "Devam et",
                 style: TextStyle(
-                  color: isEmailValid ? Colors.white : Colors.grey.shade400,
+                  color:
+                      isEmailValid && isPasswordValid
+                          ? Colors.white
+                          : Colors.grey.shade400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -112,11 +148,11 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
             ),
             const SizedBox(height: 30),
             Text(
-              "E-postanızı girin.",
+              "E-postanızı ve şifrenizi girin.",
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
-            Text("E-postanızı girin."),
+            Text("E-postanızı ve şifrenizi girin."),
             const SizedBox(height: 20),
             CustomTextField(
               hint: "Email girin:",
@@ -129,6 +165,17 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
                 });
               },
             ),
+            CustomTextField(
+              hint: "Şifre girin:",
+              label: "Şifre",
+              controller: _password,
+              password: true, // Şifre gizleme özelliği için parametreyi ekledik
+              onChanged: (text) {
+                setState(() {
+                  _passwordText = text;
+                });
+              },
+            ),
             _buildErrorText(isEmailValid),
             const Spacer(),
             Row(
@@ -136,19 +183,18 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
                 Expanded(
                   child: FilledButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                        isEmailValid ? Colors.blue.shade400 : Colors.grey[400],
+                      backgroundColor: MaterialStateProperty.all(
+                        isEmailValid && isPasswordValid
+                            ? Colors.blue.shade400
+                            : Colors.grey[400],
                       ),
-                      shape: WidgetStateProperty.all(
+                      shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
-                    onPressed:
-                        isEmailValid // E-posta geçerliyse devam et butonunu etkinleştir
-                            ? () {}
-                            : null,
+                    onPressed: isEmailValid && isPasswordValid ? _login : null,
                     child: const Text(
                       "Devam et",
                       style: TextStyle(color: Colors.white),
@@ -162,10 +208,8 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
       ),
     );
   }
-}
 
-bool _isValidEmail(String email) {
-  // Basit bir e-posta doğrulama kontrolü
-  // Burada daha kapsamlı bir e-posta doğrulama işlemi
-  return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
 }
