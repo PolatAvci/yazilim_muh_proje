@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 import 'package:yazilim_muh_proje/pages/register_page.dart';
-import 'package:yazilim_muh_proje/pages/kullanim_kosullari_page.dart'; // KullanimKosullariPage'yi import et
+import 'package:yazilim_muh_proje/pages/kullanim_kosullari_page.dart';
 import 'package:yazilim_muh_proje/Models/user.dart';
-import 'package:yazilim_muh_proje/Models/veriler.dart'; // Veriler'i import et
+import 'package:yazilim_muh_proje/Models/veriler.dart';
 
 class LoginWithEmailPage extends StatefulWidget {
   const LoginWithEmailPage({super.key});
@@ -78,22 +78,17 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
     bool isPasswordValid = _passwordText.isNotEmpty;
 
     if (isEmailValid && isPasswordValid) {
-      // Kullanıcıyı doğrula
       User user = Veriler.kullanicilar.firstWhere(
         (user) => user.email == _inputText && user.sifre == _passwordText,
-        orElse:
-            () =>
-                User(email: "", sifre: ""), // Varsayılan bir User döndürüyoruz
+        orElse: () => User(email: "", sifre: ""),
       );
 
       if (user.email.isNotEmpty) {
-        // Kullanıcı doğrulandı, KullanimKosullariPage'e yönlendir
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => KullanimKosullariPage()),
         );
       } else {
-        // Kullanıcı bulunamadı, hata mesajı göster
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Geçersiz e-posta veya şifre")));
@@ -103,7 +98,7 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isEmailValid = _isValidEmail(_inputText); // E-posta doğrulaması
+    bool isEmailValid = _isValidEmail(_inputText);
     bool isPasswordValid = _passwordText.isNotEmpty;
 
     return Scaffold(
@@ -169,7 +164,7 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
               hint: "Şifre girin:",
               label: "Şifre",
               controller: _password,
-              password: true, // Şifre gizleme özelliği için parametreyi ekledik
+              password: true,
               onChanged: (text) {
                 setState(() {
                   _passwordText = text;

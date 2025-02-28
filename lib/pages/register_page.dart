@@ -130,16 +130,14 @@ class RegisterPage extends StatelessWidget {
                         textColor: Colors.white,
                         fontSize: 13,
                         onPressed: () {
-                          // Validate passwords match
                           if (_password.text == _repassword.text) {
-                            // Create User object
                             User newUser = User(
                               email: _email.text,
                               sifre: _password.text,
                             );
-                            // Add the new user to the list
+
                             Veriler.kullanicilar.add(newUser);
-                            // Navigate to the KullanimKosullariPage
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -147,7 +145,6 @@ class RegisterPage extends StatelessWidget {
                               ),
                             );
                           } else {
-                            // Show error if passwords don't match
                             showDialog(
                               context: context,
                               builder:
