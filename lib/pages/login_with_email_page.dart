@@ -80,10 +80,12 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
     if (isEmailValid && isPasswordValid) {
       // Kullanıcıyı doğrula
       User user = Veriler.kullanicilar.firstWhere(
-        (user) => user.email == _inputText && user.sifre == _passwordText,
+        (user) => user.email == _inputText && user.password == _passwordText,
         orElse:
-            () =>
-                User(email: "", sifre: ""), // Varsayılan bir User döndürüyoruz
+            () => User(
+              email: "",
+              password: "",
+            ), // Varsayılan bir User döndürüyoruz
       );
 
       if (user.email.isNotEmpty) {
@@ -94,9 +96,12 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
         );
       } else {
         // Kullanıcı bulunamadı, hata mesajı göster
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Geçersiz e-posta veya şifre")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Geçersiz e-posta veya şifre"),
+            showCloseIcon: true,
+          ),
+        );
       }
     }
   }
@@ -183,12 +188,12 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
                 Expanded(
                   child: FilledButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                         isEmailValid && isPasswordValid
                             ? Colors.blue.shade400
                             : Colors.grey[400],
                       ),
-                      shape: MaterialStateProperty.all(
+                      shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

@@ -1,5 +1,5 @@
 class User {
   String email;
-  String sifre;
-  User({required this.email, required this.sifre});
+  String password;
+  User({required this.email, required this.password});
 }

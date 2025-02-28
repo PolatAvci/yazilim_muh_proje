@@ -131,22 +131,7 @@ class RegisterPage extends StatelessWidget {
                         fontSize: 13,
                         onPressed: () {
                           // Validate passwords match
-                          if (_password.text == _repassword.text) {
-                            // Create User object
-                            User newUser = User(
-                              email: _email.text,
-                              sifre: _password.text,
-                            );
-                            // Add the new user to the list
-                            Veriler.kullanicilar.add(newUser);
-                            // Navigate to the KullanimKosullariPage
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginWithEmailPage(),
-                              ),
-                            );
-                          } else {
+                          if (_password.text != _repassword.text) {
                             // Show error if passwords don't match
                             showDialog(
                               context: context,
@@ -159,12 +144,70 @@ class RegisterPage extends StatelessWidget {
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
-                                        child: Text('Tamam'),
+                                        child: Text(
+                                          'Tamam',
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
                                       ),
                                     ],
                                   ),
                             );
+                            return;
                           }
+                          if (_password.text.isEmpty ||
+                              _email.text.isEmpty ||
+                              _name.text.isEmpty ||
+                              _surname.text.isEmpty) {
+                            showDialog(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: Text("Hata"),
+                                    content: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(text: "Lütfen tüm alanları"),
+                                          TextSpan(
+                                            text: " eksiksiz",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          TextSpan(text: " doldurun."),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          "Tamam",
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                            );
+                            return;
+                          }
+                          //Hata yoksa
+                          // Create User object
+                          User newUser = User(
+                            email: _email.text,
+                            password: _password.text,
+                          );
+                          // Add the new user to the list
+                          Veriler.kullanicilar.add(newUser);
+                          // Navigate to the KullanimKosullariPage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginWithEmailPage(),
+                            ),
+                          );
                         },
                       ),
                     ],
