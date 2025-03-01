@@ -39,13 +39,6 @@ class _PaymentPageState extends State<PaymentPage> {
     'Sürat Kargo',
   ];
 
-  // Example list of products in the cart with their prices
-  final List<Map<String, dynamic>> cartItems = [
-    {"name": "Ürün 1", "price": 100.0},
-    {"name": "Ürün 2", "price": 150.0},
-    {"name": "Ürün 3", "price": 200.0},
-  ];
-
   // Calculate total cart price
   double _calculateTotalPrice() {
     double total = 0.0;
@@ -158,6 +151,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   SnackBar(
                     content: Text("Ödeme başarıyla tamamlandı!"),
                     backgroundColor: Colors.green,
+                    showCloseIcon: true,
                   ),
                 );
                 Navigator.pop(context); // Close the dialog
@@ -175,15 +169,21 @@ class _PaymentPageState extends State<PaymentPage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
         title: Text(
-          "Ödeme Ekranı",
+          "Ödemeyi Tamamla",
           style: GoogleFonts.poppins(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blue.shade400,
         centerTitle: true,
       ),
       body: Padding(
@@ -203,6 +203,12 @@ class _PaymentPageState extends State<PaymentPage> {
                 });
               } else {
                 // Show confirmation dialog after final step
+                for (int i = 0; i < 4; i++) {
+                  // Tüm adımları kontrol et boş alan varsa fonksiyon durur
+                  if (!_validateStep(i)) {
+                    return;
+                  }
+                }
                 _showConfirmationDialog();
               }
             }
@@ -214,124 +220,185 @@ class _PaymentPageState extends State<PaymentPage> {
               });
             }
           },
+          stepIconBuilder: (stepIndex, stepState) {
+            if (_currentStep == stepIndex) {
+              return Icon(Icons.edit, color: Colors.blue.shade400);
+            } else if (_currentStep > stepIndex) {
+              return Expanded(
+                child: Icon(Icons.check_circle, color: Colors.green),
+              );
+            }
+            return null;
+          },
+          controlsBuilder: (context, details) {
+            return Row(
+              children: [
+                ElevatedButton(
+                  onPressed: details.onStepContinue,
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(
+                      Colors.blue.shade400,
+                    ),
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
+                  ),
+                  child: Text("İleri", style: TextStyle(color: Colors.white)),
+                ),
+                SizedBox(width: 15),
+                TextButton(
+                  onPressed: details.onStepCancel,
+                  style: ButtonStyle(
+                    shape: WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    ),
+                    foregroundColor: WidgetStatePropertyAll(
+                      Colors.blue.shade400,
+                    ),
+                  ),
+                  child: Text("İptal"),
+                ),
+              ],
+            );
+          },
           steps: [
             Step(
               title: Text('Kişisel Bilgiler', style: GoogleFonts.poppins()),
-              content: Column(
-                children: [
-                  _buildTextField(
-                    label: "Ad Soyad",
-                    icon: Icons.person,
-                    controller: nameController,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(
-                    label: "E-Posta",
-                    icon: Icons.email,
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(
-                    label: "Telefon Numarası",
-                    icon: Icons.phone,
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                  ),
-                ],
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: "Ad Soyad",
+                      icon: Icons.person,
+                      controller: nameController,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "E-Posta",
+                      icon: Icons.email,
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "Telefon Numarası",
+                      icon: Icons.phone,
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ],
+                ),
               ),
             ),
             Step(
               title: Text('Adres Bilgileri', style: GoogleFonts.poppins()),
-              content: Column(
-                children: [
-                  _buildTextField(
-                    label: "İl",
-                    icon: Icons.location_city,
-                    controller: cityController,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(
-                    label: "İlçe",
-                    icon: Icons.map,
-                    controller: districtController,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(
-                    label: "Adres",
-                    icon: Icons.home,
-                    controller: addressController,
-                    maxLines: 3,
-                  ),
-                ],
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: "İl",
+                      icon: Icons.location_city,
+                      controller: cityController,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "İlçe",
+                      icon: Icons.map,
+                      controller: districtController,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "Adres",
+                      icon: Icons.home,
+                      controller: addressController,
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
               ),
             ),
             Step(
               title: Text('Kart Bilgileri', style: GoogleFonts.poppins()),
-              content: Column(
-                children: [
-                  _buildTextField(
-                    label: "Kart Numarası",
-                    icon: Icons.credit_card,
-                    controller: cardController,
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField(
-                          label: "Son Kullanma",
-                          icon: Icons.calendar_today,
-                          controller: dateController,
-                          keyboardType: TextInputType.datetime,
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: "Kart Numarası",
+                      icon: Icons.credit_card,
+                      controller: cardController,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTextField(
+                            label: "Son Kullanma",
+                            icon: Icons.calendar_today,
+                            controller: dateController,
+                            keyboardType: TextInputType.datetime,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _buildTextField(
-                          label: "CVV",
-                          icon: Icons.lock,
-                          controller: cvvController,
-                          keyboardType: TextInputType.number,
-                          obscureText: true,
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _buildTextField(
+                            label: "CVV",
+                            icon: Icons.lock,
+                            controller: cvvController,
+                            keyboardType: TextInputType.number,
+                            obscureText: true,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             Step(
               title: Text('Kargo Firması', style: GoogleFonts.poppins()),
-              content: Column(
-                children: [
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: "Kargo Firması Seçin",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: "Kargo Firması Seçin",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
+                      value: _selectedCargoCompany,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedCargoCompany = newValue;
+                        });
+                      },
+                      items:
+                          cargoCompanies.map((company) {
+                            return DropdownMenuItem<String>(
+                              value: company,
+                              child: Text(company),
+                            );
+                          }).toList(),
                     ),
-                    value: _selectedCargoCompany,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedCargoCompany = newValue;
-                      });
-                    },
-                    items:
-                        cargoCompanies.map((company) {
-                          return DropdownMenuItem<String>(
-                            value: company,
-                            child: Text(company),
-                          );
-                        }).toList(),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ],
@@ -359,7 +426,7 @@ class _PaymentPageState extends State<PaymentPage> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Colors.green),
+        prefixIcon: Icon(icon, color: Colors.blue.shade400),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 15,
           horizontal: 20,

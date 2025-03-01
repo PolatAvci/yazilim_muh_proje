@@ -120,7 +120,7 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: Colors.blue.shade400,
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete, size: 28),
+            icon: const Icon(Icons.delete, size: 28, color: Colors.white),
             onPressed: () {
               setState(() {
                 Items.cartItems.clear();
