@@ -120,6 +120,7 @@ class _PaymentPageState extends State<PaymentPage> {
             style: GoogleFonts.poppins(),
           ),
           content: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(

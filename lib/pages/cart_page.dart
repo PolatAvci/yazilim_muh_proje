@@ -82,7 +82,16 @@ class _CartPageState extends State<CartPage> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(context); // Close the
+                  if (items.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Sepetiniz boş."),
+                        showCloseIcon: true,
+                      ),
+                    );
+                    return;
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -109,6 +118,12 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
         title: Text(
           'TRAKSTORE Sepetim',
           style: GoogleFonts.poppins(
