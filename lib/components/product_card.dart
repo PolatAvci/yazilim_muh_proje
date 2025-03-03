@@ -44,6 +44,11 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     _isFav = _getIsFav();
     return InkWell(
@@ -93,10 +98,12 @@ class _ProductCardState extends State<ProductCard> {
                         );
                         UserFavItems.items.add({widget.userId: widget.id});
                       },
-                      icon:
-                          _isFav
-                              ? Icon(Icons.favorite, color: Colors.red)
-                              : Icon(Icons.favorite_border_outlined),
+                      icon: Icon(
+                        _isFav
+                            ? Icons.favorite
+                            : Icons.favorite_border_outlined,
+                        color: _isFav ? Colors.red : Colors.grey,
+                      ),
                     ),
                   ],
                 ),

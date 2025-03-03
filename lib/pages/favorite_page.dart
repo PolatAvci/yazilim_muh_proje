@@ -18,12 +18,6 @@ class _FavoritePageState extends State<FavoritePage> {
     List<int> favItemsId = UserFavItems.getAllValuesByUserId(widget.userId);
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-        ),
         title: Text(
           "Favorilerim",
           style: TextStyle(
@@ -33,6 +27,12 @@ class _FavoritePageState extends State<FavoritePage> {
           ),
         ),
         backgroundColor: Colors.blue.shade400,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: ListView.builder(
         itemCount: favItemsId.length,
@@ -59,7 +59,7 @@ class _FavoritePageState extends State<FavoritePage> {
                   width: 100,
                   child: Image.asset(item.image, fit: BoxFit.cover),
                 ),
-                SizedBox(width: 15), // Resim ve metin arasına boşluk ekledik
+                SizedBox(width: 15),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -86,7 +86,7 @@ class _FavoritePageState extends State<FavoritePage> {
                     ],
                   ),
                 ),
-                Spacer(), // Sağ tarafta boşluk bırakır
+                Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: IconButton(
