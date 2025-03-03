@@ -6,7 +6,7 @@ import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
 class FavoritePage extends StatefulWidget {
   final int userId;
 
-  FavoritePage({required this.userId});
+  const FavoritePage({super.key, required this.userId});
 
   @override
   State<FavoritePage> createState() => _FavoritePageState();

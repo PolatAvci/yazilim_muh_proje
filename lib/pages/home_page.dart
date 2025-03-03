@@ -7,6 +7,8 @@ import 'package:yazilim_muh_proje/pages/favorite_page.dart';
 import 'package:yazilim_muh_proje/pages/login_page.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }

@@ -12,7 +12,8 @@ class ProductCard extends StatefulWidget {
   final String imagePath;
   final int userId;
 
-  ProductCard({
+  const ProductCard({
+    super.key,
     required this.id,
     required this.category,
     required this.details,
