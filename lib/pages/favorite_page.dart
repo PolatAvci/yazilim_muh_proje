@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/favorite_list.dart';
+import 'package:yazilim_muh_proje/Models/product.dart';
+import 'package:yazilim_muh_proje/Models/product_items.dart';
+import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
 
 class FavoritePage extends StatefulWidget {
+  final int userId;
+
+  FavoritePage({required this.userId});
+
   @override
   State<FavoritePage> createState() => _FavoritePageState();
 }
@@ -9,6 +15,7 @@ class FavoritePage extends StatefulWidget {
 class _FavoritePageState extends State<FavoritePage> {
   @override
   Widget build(BuildContext context) {
+    List<int> favItemsId = UserFavItems.getAllValuesByUserId(widget.userId);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -28,9 +35,21 @@ class _FavoritePageState extends State<FavoritePage> {
         backgroundColor: Colors.blue.shade400,
       ),
       body: ListView.builder(
-        itemCount: FavoriteList.items.length,
+        itemCount: favItemsId.length,
         itemBuilder: (context, i) {
-          var item = FavoriteList.items[i];
+          // ID'ye göre favori ürünleri filtreliyoruz
+          var item = ProductItems.items.firstWhere(
+            (product) => product.id == favItemsId[i],
+            orElse:
+                () => Product(
+                  id: 0,
+                  category: "",
+                  details: "",
+                  name: "",
+                  price: 0,
+                  image: "",
+                ),
+          );
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: Row(
@@ -73,12 +92,11 @@ class _FavoritePageState extends State<FavoritePage> {
                   child: IconButton(
                     onPressed: () {
                       setState(() {
-                        for (int j = 0; j < FavoriteList.items.length; j++) {
-                          if (item.id == FavoriteList.items[j].id) {
-                            FavoriteList.items.removeAt(j);
-                            break;
-                          }
-                        }
+                        // Favorilerden çıkarma işlemi
+                        UserFavItems.removeFavorite(widget.userId, item.id);
+                        favItemsId = UserFavItems.getAllValuesByUserId(
+                          widget.userId,
+                        );
                       });
                     },
                     icon: Icon(Icons.delete, color: Colors.red),

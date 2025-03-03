@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/favorite_list.dart';
-import 'package:yazilim_muh_proje/Models/product.dart';
+import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
 
 class ProductCard extends StatefulWidget {
   final Widget image;
@@ -11,6 +10,7 @@ class ProductCard extends StatefulWidget {
   final String category;
   final String details;
   final String imagePath;
+  final int userId;
 
   ProductCard({
     required this.id,
@@ -21,6 +21,7 @@ class ProductCard extends StatefulWidget {
     required this.price,
     required this.onpressed,
     required this.imagePath,
+    required this.userId,
   });
 
   @override
@@ -28,10 +29,22 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool _isFav = false;
+  late List<int> _userFavsId; // initialize it later
+  late bool _isFav;
+
+  bool _getIsFav() {
+    _userFavsId = UserFavItems.getAllValuesByUserId(widget.userId);
+    for (int i = 0; i < _userFavsId.length; i++) {
+      if (_userFavsId[i] == widget.id) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
+    _isFav = _getIsFav();
     return InkWell(
       onTap: widget.onpressed,
       child: Padding(
@@ -61,12 +74,8 @@ class _ProductCardState extends State<ProductCard> {
                           _isFav = !_isFav;
                         });
                         if (!_isFav) {
-                          for (int j = 0; j < FavoriteList.items.length; j++) {
-                            if (widget.id == FavoriteList.items[j].id) {
-                              FavoriteList.items.removeAt(j);
-                              break;
-                            }
-                          }
+                          UserFavItems.removeFavorite(widget.userId, widget.id);
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Ürün favorilerden çıkarıldı."),
@@ -81,16 +90,7 @@ class _ProductCardState extends State<ProductCard> {
                             showCloseIcon: true,
                           ),
                         );
-                        FavoriteList.items.add(
-                          Product(
-                            id: widget.id,
-                            category: widget.category,
-                            details: widget.details,
-                            name: widget.name,
-                            price: widget.price,
-                            image: widget.imagePath,
-                          ),
-                        );
+                        UserFavItems.items.add({widget.userId: widget.id});
                       },
                       icon:
                           _isFav

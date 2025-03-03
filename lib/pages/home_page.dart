@@ -6,7 +6,13 @@ import 'package:yazilim_muh_proje/pages/cart_page.dart';
 import 'package:yazilim_muh_proje/pages/favorite_page.dart';
 import 'package:yazilim_muh_proje/pages/login_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final int _userId = 1; //login yapılmış gibi göstermek için
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,8 +103,12 @@ class HomePage extends StatelessWidget {
                 Navigator.pop(context); // drawer'i kapatmak için
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => FavoritePage()),
-                );
+                  MaterialPageRoute(
+                    builder: (context) => FavoritePage(userId: _userId),
+                  ),
+                ).then((value) {
+                  setState(() {});
+                });
               },
             ),
           ],
@@ -150,6 +160,7 @@ class HomePage extends StatelessWidget {
               width: 200,
               child: ProductCard(
                 id: item.id,
+                userId: _userId,
                 category: item.category,
                 details: item.category,
                 imagePath: item.image,
