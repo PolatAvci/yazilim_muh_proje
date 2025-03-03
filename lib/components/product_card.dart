@@ -31,6 +31,18 @@ class _ProductCardState extends State<ProductCard> {
   bool _isFav = false;
 
   @override
+  void initState() {
+    super.initState();
+    _updateFavoriteStatus();
+  }
+
+  void _updateFavoriteStatus() {
+    setState(() {
+      _isFav = FavoriteList.items.any((item) => item.id == widget.id);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: widget.onpressed,
@@ -58,44 +70,43 @@ class _ProductCardState extends State<ProductCard> {
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          _isFav = !_isFav;
-                        });
-                        if (!_isFav) {
-                          for (int j = 0; j < FavoriteList.items.length; j++) {
-                            if (widget.id == FavoriteList.items[j].id) {
-                              FavoriteList.items.removeAt(j);
-                              break;
-                            }
+                          if (_isFav) {
+                            FavoriteList.items.removeWhere(
+                              (item) => item.id == widget.id,
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün favorilerden çıkarıldı."),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          } else {
+                            FavoriteList.items.add(
+                              Product(
+                                id: widget.id,
+                                category: widget.category,
+                                details: widget.details,
+                                name: widget.name,
+                                price: widget.price,
+                                image: widget.imagePath,
+                              ),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün favorilere eklendi."),
+                                showCloseIcon: true,
+                              ),
+                            );
                           }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Ürün favorilerden çıkarıldı."),
-                              showCloseIcon: true,
-                            ),
-                          );
-                          return;
-                        }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Ürün favorilere eklendi."),
-                            showCloseIcon: true,
-                          ),
-                        );
-                        FavoriteList.items.add(
-                          Product(
-                            id: widget.id,
-                            category: widget.category,
-                            details: widget.details,
-                            name: widget.name,
-                            price: widget.price,
-                            image: widget.imagePath,
-                          ),
-                        );
+                          _isFav = !_isFav; // Favori durumunu değiştir
+                        });
                       },
-                      icon:
-                          _isFav
-                              ? Icon(Icons.favorite, color: Colors.red)
-                              : Icon(Icons.favorite_border_outlined),
+                      icon: Icon(
+                        _isFav
+                            ? Icons.favorite
+                            : Icons.favorite_border_outlined,
+                        color: _isFav ? Colors.red : Colors.grey,
+                      ),
                     ),
                   ],
                 ),
@@ -111,5 +122,11 @@ class _ProductCardState extends State<ProductCard> {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateFavoriteStatus();
   }
 }

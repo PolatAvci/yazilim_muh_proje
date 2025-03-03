@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 import 'package:yazilim_muh_proje/pages/login_with_email_page.dart';
 import 'package:yazilim_muh_proje/pages/register_page.dart';
-import 'kullanim_kosullari_page.dart';
-import 'gizlilik_sozlesmesi_page.dart';
+import 'package:yazilim_muh_proje/pages/kullanim_kosullari_page.dart';
+import 'package:yazilim_muh_proje/pages/gizlilik_sozlesmesi_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -96,7 +96,10 @@ class LoginPage extends StatelessWidget {
                             color: Colors.black,
                           ),
                           children: [
-                            const TextSpan(text: "Devam etmek suretiyle "),
+                            const TextSpan(
+                              text: "Devam etmek suretiyle ",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                             WidgetSpan(
                               child: GestureDetector(
                                 onTap: () {
@@ -118,7 +121,10 @@ class LoginPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const TextSpan(text: "ve "),
+                            const TextSpan(
+                              text: "ve ",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                             WidgetSpan(
                               child: GestureDetector(
                                 onTap: () {
@@ -140,7 +146,10 @@ class LoginPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const TextSpan(text: "kabul etmiş olursunuz."),
+                            const TextSpan(
+                              text: "kabul etmiş olursunuz.",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
                       ),

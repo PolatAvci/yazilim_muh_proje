@@ -5,6 +5,7 @@ import 'package:yazilim_muh_proje/pages/address_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
 import 'package:yazilim_muh_proje/pages/favorite_page.dart';
 import 'package:yazilim_muh_proje/pages/login_page.dart';
+import 'package:yazilim_muh_proje/pages/orders_page.dart.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -20,11 +21,9 @@ class HomePage extends StatelessWidget {
                 decoration: BoxDecoration(color: Colors.blue.shade400),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 10),
@@ -49,6 +48,7 @@ class HomePage extends StatelessWidget {
                         ),
                       ],
                     ),
+                    SizedBox(height: 8),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
@@ -76,14 +76,16 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.shopping_bag, color: Colors.blue.shade400),
               title: Text('Siparişlerim'),
               onTap: () {
-                // İşlem eklenebilir
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => OrdersPage()),
+                );
               },
             ),
             ListTile(
               leading: Icon(Icons.location_on, color: Colors.blue.shade400),
               title: Text('Adreslerim'),
               onTap: () {
-                Navigator.pop(context); // drawer'i kapatmak için
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AddressPage()),
@@ -94,7 +96,6 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.favorite, color: Colors.blue.shade400),
               title: Text('Favorilerim'),
               onTap: () {
-                Navigator.pop(context); // drawer'i kapatmak için
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => FavoritePage()),
@@ -110,7 +111,7 @@ class HomePage extends StatelessWidget {
           builder:
               (context) => IconButton(
                 onPressed: () {
-                  Scaffold.of(context).openDrawer(); // Drawer'ı açar
+                  Scaffold.of(context).openDrawer();
                 },
                 icon: Icon(Icons.menu, color: Colors.white),
               ),
