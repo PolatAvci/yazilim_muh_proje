@@ -34,79 +34,142 @@ class _FavoritePageState extends State<FavoritePage> {
           },
         ),
       ),
-      body: ListView.builder(
-        itemCount: favItemsId.length,
-        itemBuilder: (context, i) {
-          // ID'ye göre favori ürünleri filtreliyoruz
-          var item = ProductItems.items.firstWhere(
-            (product) => product.id == favItemsId[i],
-            orElse:
-                () => Product(
-                  id: 0,
-                  category: "",
-                  details: "",
-                  name: "",
-                  price: 0,
-                  image: "",
+      body:
+          favItemsId.isEmpty
+              ? Center(
+                child: Text(
+                  "Henüz favori ürün eklemediniz",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-          );
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: Image.asset(item.image, fit: BoxFit.cover),
-                ),
-                SizedBox(width: 15),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          item.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+              )
+              : ListView.builder(
+                itemCount: favItemsId.length,
+                itemBuilder: (context, i) {
+                  // ID'ye göre favori ürünleri filtreliyoruz
+                  var item = ProductItems.items.firstWhere(
+                    (product) => product.id == favItemsId[i],
+                    orElse:
+                        () => Product(
+                          id: 0,
+                          category: "",
+                          details: "",
+                          name: "",
+                          price: 0,
+                          image: "",
+                        ),
+                  );
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 10,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 100,
+                          child: Image.asset(item.image, fit: BoxFit.cover),
+                        ),
+                        SizedBox(width: 15),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  item.name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                "\$${item.price}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "\$${item.price}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                        Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (context) => AlertDialog(
+                                      title: Text(
+                                        "${item.name} favorilerden çıkarılsın mı?",
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                              context,
+                                            ); //Dialog'u kapatmak için
+                                          },
+                                          child: Text(
+                                            "İptal",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              Navigator.pop(
+                                                context,
+                                              ); //Dialog'u kapatmak için
+                                              // Favorilerden çıkarma işlemi
+                                              UserFavItems.removeFavorite(
+                                                widget.userId,
+                                                item.id,
+                                              );
+                                              favItemsId =
+                                                  UserFavItems.getAllValuesByUserId(
+                                                    widget.userId,
+                                                  );
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "Ürün favorilerden kaldırıldı.",
+                                                  ),
+                                                  showCloseIcon: true,
+                                                ),
+                                              );
+                                            });
+                                          },
+                                          child: Text(
+                                            "Onayla",
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                            },
+                            icon: Icon(Icons.delete, color: Colors.red),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                Spacer(),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        // Favorilerden çıkarma işlemi
-                        UserFavItems.removeFavorite(widget.userId, item.id);
-                        favItemsId = UserFavItems.getAllValuesByUserId(
-                          widget.userId,
-                        );
-                      });
-                    },
-                    icon: Icon(Icons.delete, color: Colors.red),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+                      ],
+                    ),
+                  );
+                },
+              ),
     );
   }
 }
