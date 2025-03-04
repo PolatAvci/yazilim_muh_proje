@@ -6,6 +6,7 @@ import 'package:yazilim_muh_proje/pages/cart_page.dart';
 import 'package:yazilim_muh_proje/pages/favorite_page.dart';
 import 'package:yazilim_muh_proje/pages/login_page.dart';
 import 'package:yazilim_muh_proje/pages/orders_page.dart.dart';
+import 'package:yazilim_muh_proje/pages/product_detail_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -117,6 +118,12 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.exit_to_app, color: Colors.blue.shade400),
+              title: Text("Oturumu kapat"),
+              onTap: () {},
+            ),
           ],
         ),
       ),
@@ -176,7 +183,25 @@ class _HomePageState extends State<HomePage> {
                 ),
                 name: item.name,
                 price: item.price,
-                onpressed: () {},
+                onpressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => ProductDetailPage(
+                            id: item.id,
+                            userId: _userId,
+                            name: item.name,
+                            category: item.category,
+                            details: item.details,
+                            imagePath: item.image,
+                            price: item.price,
+                          ),
+                    ),
+                  ).then((value) {
+                    setState(() {});
+                  });
+                },
               ),
             );
           },

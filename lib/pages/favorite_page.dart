@@ -66,105 +66,112 @@ class _FavoritePageState extends State<FavoritePage> {
                       vertical: 10,
                       horizontal: 10,
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
                       children: [
-                        SizedBox(
-                          width: 100,
-                          child: Image.asset(item.image, fit: BoxFit.cover),
-                        ),
-                        SizedBox(width: 15),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  item.name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                "\$${item.price}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: IconButton(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder:
-                                    (context) => AlertDialog(
-                                      title: Text(
-                                        "${item.name} favorilerden çıkarılsın mı?",
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 100,
+                              child: Image.asset(item.image, fit: BoxFit.cover),
+                            ),
+                            SizedBox(width: 15),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      item.name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
                                       ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(
-                                              context,
-                                            ); //Dialog'u kapatmak için
-                                          },
-                                          child: Text(
-                                            "İptal",
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              Navigator.pop(
-                                                context,
-                                              ); //Dialog'u kapatmak için
-                                              // Favorilerden çıkarma işlemi
-                                              UserFavItems.removeFavorite(
-                                                widget.userId,
-                                                item.id,
-                                              );
-                                              favItemsId =
-                                                  UserFavItems.getAllValuesByUserId(
-                                                    widget.userId,
-                                                  );
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    "Ürün favorilerden kaldırıldı.",
-                                                  ),
-                                                  showCloseIcon: true,
-                                                ),
-                                              );
-                                            });
-                                          },
-                                          child: Text(
-                                            "Onayla",
-                                            style: TextStyle(
-                                              color: Colors.green,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
                                     ),
-                              );
-                            },
-                            icon: Icon(Icons.delete, color: Colors.red),
-                          ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "\$${item.price}",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder:
+                                        (context) => AlertDialog(
+                                          title: Text(
+                                            "${item.name} favorilerden çıkarılsın mı?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(
+                                                  context,
+                                                ); //Dialog'u kapatmak için
+                                              },
+                                              child: Text(
+                                                "İptal",
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  Navigator.pop(
+                                                    context,
+                                                  ); //Dialog'u kapatmak için
+                                                  // Favorilerden çıkarma işlemi
+                                                  UserFavItems.removeFavorite(
+                                                    widget.userId,
+                                                    item.id,
+                                                  );
+                                                  favItemsId =
+                                                      UserFavItems.getAllValuesByUserId(
+                                                        widget.userId,
+                                                      );
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Ürün favorilerden kaldırıldı.",
+                                                      ),
+                                                      showCloseIcon: true,
+                                                    ),
+                                                  );
+                                                });
+                                              },
+                                              child: Text(
+                                                "Onayla",
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                  );
+                                },
+                                icon: Icon(Icons.delete, color: Colors.red),
+                              ),
+                            ),
+                          ],
                         ),
+                        Divider(),
                       ],
                     ),
                   );
