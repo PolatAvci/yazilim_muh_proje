@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:yazilim_muh_proje/Models/comment.dart';
+import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
+import 'package:yazilim_muh_proje/components/comment_box.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -28,18 +31,22 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   late bool _isFav;
+  late List<Comment> productComments;
 
   @override
   void initState() {
     super.initState();
+
+    // Favori kontrolü
     List<int> favItems = UserFavItems.getAllValuesByUserId(widget.userId);
-    for (int itemId in favItems) {
-      if (itemId == widget.id) {
-        _isFav = true;
-        return;
-      }
-    }
-    _isFav = false;
+    _isFav = favItems.contains(widget.id);
+
+    // Ürüne ait yorumları filtrele
+    productComments =
+        CommentItems.items
+            .where((map) => map.containsKey(widget.id))
+            .map((map) => map[widget.id]!)
+            .toList();
   }
 
   @override
@@ -177,6 +184,47 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ),
                     ],
+                  ),
+                  Divider(),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Yorumlar",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        Text(
+                          "Tümünü gör",
+                          style: TextStyle(color: Colors.blue.shade400),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height:
+                        140, // Yorumların ListView içinde düzgün görünmesini sağlar
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: //En fazla 5 yorum göster
+                          productComments.length >= 5
+                              ? 5
+                              : productComments.length,
+                      shrinkWrap: true,
+                      physics:
+                          BouncingScrollPhysics(), // Daha yumuşak kaydırma efekti
+                      itemBuilder: (context, i) {
+                        return CommentBox(
+                          text: productComments[i].text,
+                          star: productComments[i].star,
+                          date: productComments[i].date,
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
