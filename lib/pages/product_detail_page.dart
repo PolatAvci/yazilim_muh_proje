@@ -3,6 +3,7 @@ import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
 import 'package:yazilim_muh_proje/components/comment_box.dart';
+import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -198,25 +199,34 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             fontSize: 20,
                           ),
                         ),
-                        Text(
-                          "Tümünü gör",
-                          style: TextStyle(color: Colors.blue.shade400),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AllCommentPage(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            "Tümünü gör",
+                            style: TextStyle(color: Colors.blue.shade400),
+                          ),
                         ),
                       ],
                     ),
                   ),
+
                   SizedBox(
-                    height:
-                        140, // Yorumların ListView içinde düzgün görünmesini sağlar
+                    height: 140,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: //En fazla 5 yorum göster
+                      itemCount:
                           productComments.length >= 5
                               ? 5
                               : productComments.length,
                       shrinkWrap: true,
-                      physics:
-                          BouncingScrollPhysics(), // Daha yumuşak kaydırma efekti
+                      physics: BouncingScrollPhysics(),
                       itemBuilder: (context, i) {
                         return CommentBox(
                           text: productComments[i].text,
