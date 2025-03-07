@@ -4,7 +4,7 @@ import 'package:yazilim_muh_proje/Models/comment_items.dart';
 class StarIndicator extends StatelessWidget {
   final int productId;
 
-  StarIndicator({required this.productId});
+  const StarIndicator({super.key, required this.productId});
 
   double getAverageRating(int productId) {
     List<int> ratings =

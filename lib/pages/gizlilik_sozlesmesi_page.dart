@@ -5,7 +5,7 @@ class GizlilikSozlesmesiPage extends StatefulWidget {
   const GizlilikSozlesmesiPage({super.key});
 
   @override
-  _GizlilikSozlesmesiPageState createState() => _GizlilikSozlesmesiPageState();
+  State<GizlilikSozlesmesiPage> createState() => _GizlilikSozlesmesiPageState();
 }
 
 class _GizlilikSozlesmesiPageState extends State<GizlilikSozlesmesiPage> {

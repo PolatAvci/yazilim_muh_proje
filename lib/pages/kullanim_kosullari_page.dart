@@ -5,7 +5,7 @@ class KullanimKosullariPage extends StatefulWidget {
   const KullanimKosullariPage({super.key});
 
   @override
-  _KullanimKosullariPageState createState() => _KullanimKosullariPageState();
+  State<KullanimKosullariPage> createState() => _KullanimKosullariPageState();
 }
 
 class _KullanimKosullariPageState extends State<KullanimKosullariPage> {
