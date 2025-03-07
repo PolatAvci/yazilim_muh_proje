@@ -225,9 +225,7 @@ class _PaymentPageState extends State<PaymentPage> {
             if (_currentStep == stepIndex) {
               return Icon(Icons.edit, color: Colors.blue.shade400);
             } else if (_currentStep > stepIndex) {
-              return Expanded(
-                child: Icon(Icons.check_circle, color: Colors.green),
-              );
+              return Icon(Icons.check_circle, color: Colors.green);
             }
             return null;
           },
