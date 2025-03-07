@@ -201,10 +201,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                         TextButton(
                           onPressed: () {
+                            if (productComments.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Bu ürüne henüz yorum yapılmamış.",
+                                  ),
+                                  showCloseIcon: true,
+                                ),
+                              );
+                              return;
+                            }
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AllCommentPage(),
+                                builder:
+                                    (context) => AllCommentPage(id: widget.id),
                               ),
                             );
                           },
@@ -216,26 +228,27 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ],
                     ),
                   ),
-
-                  SizedBox(
-                    height: 140,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount:
-                          productComments.length >= 5
-                              ? 5
-                              : productComments.length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (context, i) {
-                        return CommentBox(
-                          text: productComments[i].text,
-                          star: productComments[i].star,
-                          date: productComments[i].date,
-                        );
-                      },
-                    ),
-                  ),
+                  productComments.isEmpty
+                      ? Text("Bu ürüne henüz yorum yapılmamış")
+                      : SizedBox(
+                        height: 140,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount:
+                              productComments.length >= 5
+                                  ? 5
+                                  : productComments.length,
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (context, i) {
+                            return CommentBox(
+                              text: productComments[i].text,
+                              star: productComments[i].star,
+                              date: productComments[i].date,
+                            );
+                          },
+                        ),
+                      ),
                 ],
               ),
             ),

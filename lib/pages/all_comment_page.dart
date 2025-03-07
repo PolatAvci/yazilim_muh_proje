@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/comment_items.dart';
+import 'package:yazilim_muh_proje/components/star_indicator.dart';
 
 class AllCommentPage extends StatelessWidget {
+  final int id;
+  const AllCommentPage({super.key, required this.id});
+
+  List<Comment> _getComments(id) {
+    return CommentItems.items
+        .where((map) => map.containsKey(id))
+        .map((map) => map[id]!)
+        .toList();
+  }
+
   // Method to draw stars for rating
   Widget buildStarRating(int starCount) {
     List<Widget> stars = [];
@@ -19,9 +31,11 @@ class AllCommentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Comment> comments = _getComments(id);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: Colors.blue.shade400,
         title: Text(
           "Tüm Yorumlar",
           style: TextStyle(
@@ -44,12 +58,18 @@ class AllCommentPage extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              Text(
+                "Ortalama",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              SizedBox(height: 10),
+              StarIndicator(productId: id),
+              SizedBox(height: 10),
               ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: CommentItems.items.length,
+                itemCount: comments.length,
                 itemBuilder: (context, index) {
-                  var comment = CommentItems.items[index].values.first;
+                  var comment = comments[index];
 
                   return Card(
                     margin: EdgeInsets.symmetric(vertical: 10),

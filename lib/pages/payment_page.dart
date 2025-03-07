@@ -12,7 +12,7 @@ class PaymentPage extends StatefulWidget {
   });
 
   @override
-  _PaymentPageState createState() => _PaymentPageState();
+  State<PaymentPage> createState() => _PaymentPageState();
 }
 
 class _PaymentPageState extends State<PaymentPage> {
