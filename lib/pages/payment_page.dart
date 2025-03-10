@@ -155,7 +155,9 @@ class _PaymentPageState extends State<PaymentPage> {
                     showCloseIcon: true,
                   ),
                 );
-                Navigator.pop(context); // Close the dialog
+                Navigator.pop(context); // Diyalogu kapatmak için
+                Navigator.pop(context); // Sepete dönmek için
+                Navigator.pop(context); // Ana sayfaya dönmek için
               },
               child: Text('Onayla', style: GoogleFonts.poppins()),
             ),

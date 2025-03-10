@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:yazilim_muh_proje/Models/items.dart';
+import 'package:yazilim_muh_proje/Models/cart_items.dart';
 
 class CartItem extends StatefulWidget {
   final String imagePath;

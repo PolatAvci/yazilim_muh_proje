@@ -3,6 +3,7 @@ import 'package:yazilim_muh_proje/Models/product_items.dart';
 import 'package:yazilim_muh_proje/components/product_card.dart';
 import 'package:yazilim_muh_proje/pages/address_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
+import 'package:yazilim_muh_proje/pages/category_page.dart';
 import 'package:yazilim_muh_proje/pages/favorite_page.dart';
 import 'package:yazilim_muh_proje/pages/login_page.dart';
 import 'package:yazilim_muh_proje/pages/orders_page.dart.dart';
@@ -118,6 +119,17 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ),
+            ListTile(
+              leading: Icon(Icons.category, color: Colors.blue.shade400),
+              title: Text('Kategoriler'),
+              onTap: () {
+                Navigator.pop(context); // Drawer kapatmak için
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CategoryPage()),
+                );
+              },
+            ),
             Divider(),
             ListTile(
               leading: Icon(Icons.exit_to_app, color: Colors.blue.shade400),
@@ -179,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                 imagePath: item.image,
                 image: SizedBox(
                   height: 250,
-                  child: Image.asset(item.image, fit: BoxFit.cover),
+                  child: Image.asset(item.image, fit: BoxFit.contain),
                 ),
                 name: item.name,
                 price: item.price,

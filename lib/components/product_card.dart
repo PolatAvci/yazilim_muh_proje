@@ -65,14 +65,16 @@ class _ProductCardState extends State<ProductCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      widget.name,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Flexible(
+                      child: Text(
+                        widget.name,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.start,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.start,
                     ),
                     IconButton(
                       onPressed: () {
