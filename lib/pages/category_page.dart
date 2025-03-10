@@ -3,7 +3,8 @@ import 'package:yazilim_muh_proje/Models/category_items.dart';
 import 'package:yazilim_muh_proje/pages/category_products_page.dart';
 
 class CategoryPage extends StatefulWidget {
-  const CategoryPage({super.key});
+  final int userId;
+  const CategoryPage({super.key, required this.userId});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -36,6 +37,7 @@ class _CategoryPageState extends State<CategoryPage> {
                   MaterialPageRoute(
                     builder:
                         (context) => CategoryProductsPage(
+                          userId: widget.userId,
                           category: CategoryItems.items[index].name,
                         ),
                   ),

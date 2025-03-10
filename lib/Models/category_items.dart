@@ -1,4 +1,4 @@
-import 'package:yazilim_muh_proje/Models/Category.dart';
+import 'package:yazilim_muh_proje/Models/category.dart';
 
 class CategoryItems {
   static List<Category> items = [

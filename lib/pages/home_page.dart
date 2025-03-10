@@ -126,7 +126,9 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context); // Drawer kapatmak için
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CategoryPage()),
+                  MaterialPageRoute(
+                    builder: (context) => CategoryPage(userId: _userId),
+                  ),
                 );
               },
             ),

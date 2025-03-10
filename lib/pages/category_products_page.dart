@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
 import 'package:yazilim_muh_proje/Models/product_items.dart';
+import 'package:yazilim_muh_proje/pages/product_detail_page.dart';
 
 class CategoryProductsPage extends StatelessWidget {
   final String category;
+  final int userId;
 
-  const CategoryProductsPage({super.key, required this.category});
+  const CategoryProductsPage({
+    super.key,
+    required this.category,
+    required this.userId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +37,12 @@ class CategoryProductsPage extends StatelessWidget {
       body:
           categoryProducts.isEmpty
               ? Center(
-                child: Flexible(
-                  child: Text(
-                    "Bu kategoride ürün bulunmamaktadır",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                  ),
+                child: Text(
+                  "Bu kategoride ürün bulunmamaktadır",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
                 ),
               )
               : GridView.builder(
@@ -56,41 +60,62 @@ class CategoryProductsPage extends StatelessWidget {
                             10,
                           ), // Sadece Card içinde borderRadius
                         ),
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                10,
-                              ), // Resmin de köşelerinin yuvarlak olması için
-                              child: Image.asset(
-                                categoryProducts[index].image,
-                                fit: BoxFit.contain,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => ProductDetailPage(
+                                      id: categoryProducts[index].id,
+                                      userId: userId,
+                                      name: categoryProducts[index].name,
+                                      category:
+                                          categoryProducts[index].category,
+                                      details: categoryProducts[index].details,
+                                      imagePath: categoryProducts[index].image,
+                                      price: categoryProducts[index].price,
+                                    ),
+                              ),
+                            );
+                          },
+                          child: Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  10,
+                                ), // Resmin de köşelerinin yuvarlak olması için
+                                child: Image.asset(
+                                  categoryProducts[index].image,
+                                  fit: BoxFit.contain,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                              ),
+                              Container(
                                 width: double.infinity,
-                                height: double.infinity,
-                              ),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade400, // Arka plan rengi
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10),
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color:
+                                      Colors.blue.shade400, // Arka plan rengi
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    bottomRight: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  categoryProducts[index].name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                              child: Text(
-                                categoryProducts[index].name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
