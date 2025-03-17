@@ -4,11 +4,19 @@ import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/order.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 
-class OrderDetailPage extends StatelessWidget {
+class OrderDetailPage extends StatefulWidget {
   final Order order;
-  final TextEditingController commentController = TextEditingController();
 
   OrderDetailPage({super.key, required this.order});
+
+  @override
+  State<OrderDetailPage> createState() => _OrderDetailPageState();
+}
+
+class _OrderDetailPageState extends State<OrderDetailPage> {
+  final TextEditingController commentController = TextEditingController();
+
+  int star = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -36,24 +44,29 @@ class OrderDetailPage extends StatelessWidget {
           children: [
             _buildCard(
               'Müşteri Adı:',
-              order.customerName,
+              widget.order.customerName,
               Colors.black,
               FontWeight.bold,
             ),
-            _buildCard('Ürün:', order.name, Colors.black, FontWeight.bold),
+            _buildCard(
+              'Ürün:',
+              widget.order.name,
+              Colors.black,
+              FontWeight.bold,
+            ),
             _buildCard(
               'Fiyat:',
-              '\$${order.price.toStringAsFixed(2)}',
+              '\$${widget.order.price.toStringAsFixed(2)}',
               Colors.red,
               FontWeight.bold,
             ),
             _buildCard(
               'Durum:',
-              order.status,
-              _getStatusColor(order.status),
+              widget.order.status,
+              _getStatusColor(widget.order.status),
               FontWeight.bold,
             ),
-            _buildStatusCard(order.status),
+            _buildStatusCard(widget.order.status),
             Card(
               elevation: 5,
               margin: EdgeInsets.symmetric(vertical: 4),
@@ -90,6 +103,25 @@ class OrderDetailPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Row(
+                    children: List.generate(
+                      5,
+                      (index) => IconButton(
+                        onPressed: () {
+                          setState(() {
+                            star = index + 1;
+                          });
+                        },
+                        icon:
+                            star > index
+                                ? Icon(Icons.star, color: Colors.blue.shade400)
+                                : Icon(
+                                  Icons.star_border,
+                                  color: Colors.blue.shade400,
+                                ),
+                      ),
+                    ),
+                  ),
                   Padding(
                     padding: EdgeInsets.all(10),
                     child: Button(
@@ -99,9 +131,9 @@ class OrderDetailPage extends StatelessWidget {
                       textColor: Colors.white,
                       onPressed: () {
                         CommentItems.items.add({
-                          order.id: Comment(
+                          widget.order.id: Comment(
                             commentController.text,
-                            3,
+                            star,
                             DateTime.now(),
                           ),
                         });
@@ -111,6 +143,9 @@ class OrderDetailPage extends StatelessWidget {
                             showCloseIcon: true,
                           ),
                         );
+                        setState(() {
+                          star = 0;
+                        });
                         commentController.clear();
                       },
                       icon: Icons.add_circle_outline_sharp,
