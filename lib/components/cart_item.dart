@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:yazilim_muh_proje/Models/cart_items.dart';
+import 'package:yazilim_muh_proje/Models/product.dart';
 
 class CartItem extends StatefulWidget {
   final String imagePath;
@@ -11,7 +12,7 @@ class CartItem extends StatefulWidget {
   final VoidCallback onDecrement;
   final VoidCallback onIncrement;
 
-  final List<Map<String, dynamic>> cartItems = Items.cartItems;
+  final List<Product> cartItems = CartItems.items;
 
   CartItem({
     super.key,

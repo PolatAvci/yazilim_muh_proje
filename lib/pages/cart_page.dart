@@ -12,11 +12,10 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  var items = Items.cartItems;
   double get totalPrice {
-    return Items.cartItems.fold(
+    return CartItems.items.fold(
       0.0,
-      (total, item) => total + (item['price'] * item['quantity']),
+      (total, item) => total + (item.price * item.quantity),
     );
   }
 
@@ -26,27 +25,27 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildCartItem(int index) {
-    var item = items[index];
+    var item = CartItems.items[index];
     return CartItem(
-      itemName: item["name"],
-      imagePath: item["image"],
-      itemQuantity: item["quantity"],
-      itemPrice: item["price"],
+      itemName: item.name,
+      imagePath: item.image,
+      itemQuantity: item.quantity,
+      itemPrice: item.price,
       onDelete: () {
         setState(() {
-          Items.cartItems.removeAt(index);
+          CartItems.items.removeAt(index);
         });
       },
       onDecrement: () {
         setState(() {
-          if (item["quantity"] > 1) {
-            item["quantity"]--;
+          if (item.quantity > 1) {
+            item.miktarAzalt();
           }
         });
       },
       onIncrement: () {
         setState(() {
-          item["quantity"]++;
+          item.miktarArttir();
         });
       },
     );
@@ -83,7 +82,7 @@ class _CartPageState extends State<CartPage> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context); // Close the
-                  if (items.isEmpty) {
+                  if (CartItems.items.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("Sepetiniz boş."),
@@ -97,7 +96,7 @@ class _CartPageState extends State<CartPage> {
                     MaterialPageRoute(
                       builder:
                           (context) => PaymentPage(
-                            items: items,
+                            items: CartItems.items,
                             shippingCost: shippingCost,
                           ),
                     ),
@@ -138,7 +137,7 @@ class _CartPageState extends State<CartPage> {
             icon: const Icon(Icons.delete, size: 28, color: Colors.white),
             onPressed: () {
               setState(() {
-                Items.cartItems.clear();
+                CartItems.items.clear();
               });
             },
           ),
@@ -150,7 +149,7 @@ class _CartPageState extends State<CartPage> {
           children: [
             Expanded(
               child:
-                  Items.cartItems.isEmpty
+                  CartItems.items.isEmpty
                       ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -172,7 +171,7 @@ class _CartPageState extends State<CartPage> {
                         ),
                       )
                       : ListView.builder(
-                        itemCount: Items.cartItems.length,
+                        itemCount: CartItems.items.length,
                         itemBuilder: (context, index) {
                           return _buildCartItem(index);
                         },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/comment_items.dart';
+import 'package:yazilim_muh_proje/Models/product.dart';
 import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
 import 'package:yazilim_muh_proje/components/comment_box.dart';
 import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
@@ -157,7 +159,35 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          for (Product product in CartItems.items) {
+                            if (product.id == widget.id) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Ürün sepetinizde zaten var"),
+                                  showCloseIcon: true,
+                                ),
+                              );
+                              return;
+                            }
+                          }
+                          CartItems.items.add(
+                            Product(
+                              id: widget.id,
+                              category: widget.category,
+                              details: widget.details,
+                              name: widget.name,
+                              price: widget.price,
+                              image: widget.imagePath,
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Ürün sepetinize eklendi"),
+                              showCloseIcon: true,
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue.shade400,
                           padding: EdgeInsets.symmetric(
@@ -180,7 +210,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           ),
                         ),
                         child: Text(
-                          "Satın Al",
+                          "Hemen Satın Al",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),

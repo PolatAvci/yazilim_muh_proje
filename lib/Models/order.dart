@@ -1,15 +1,17 @@
-class Order {
-  final String id;
+import 'package:yazilim_muh_proje/Models/product.dart';
+
+class Order extends Product {
   final String customerName;
-  final String product;
-  final double price;
   final String status;
 
   Order({
-    required this.id,
     required this.customerName,
-    required this.product,
-    required this.price,
     required this.status,
+    required super.id,
+    required super.category,
+    required super.details,
+    required super.name,
+    required super.price,
+    required super.image,
   });
 }

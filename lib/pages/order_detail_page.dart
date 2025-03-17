@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:yazilim_muh_proje/Models/comment.dart';
+import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/order.dart';
+import 'package:yazilim_muh_proje/components/button.dart';
 
 class OrderDetailPage extends StatelessWidget {
   final Order order;
+  final TextEditingController commentController = TextEditingController();
 
-  const OrderDetailPage({super.key, required this.order});
+  OrderDetailPage({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +34,13 @@ class OrderDetailPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            _buildCard('Sipariş ID:', order.id, Colors.black, FontWeight.bold),
             _buildCard(
               'Müşteri Adı:',
               order.customerName,
               Colors.black,
               FontWeight.bold,
             ),
-            _buildCard('Ürün:', order.product, Colors.black, FontWeight.bold),
+            _buildCard('Ürün:', order.name, Colors.black, FontWeight.bold),
             _buildCard(
               'Fiyat:',
               '\$${order.price.toStringAsFixed(2)}',
@@ -51,6 +54,71 @@ class OrderDetailPage extends StatelessWidget {
               FontWeight.bold,
             ),
             _buildStatusCard(order.status),
+            Card(
+              elevation: 5,
+              margin: EdgeInsets.symmetric(vertical: 4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: commentController,
+                      decoration: InputDecoration(
+                        hintText: "Yorum yap",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ), // Çerçeve rengi siyah
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ), // Normal durum için siyah çerçeve
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 2,
+                          ), // Odaklandığında siyah çerçeve ve kalınlık artırıldı
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Button(
+                      text: 'Kaydet',
+                      buttonColor: Colors.blue.shade400,
+                      fontSize: 15,
+                      textColor: Colors.white,
+                      onPressed: () {
+                        CommentItems.items.add({
+                          order.id: Comment(
+                            commentController.text,
+                            3,
+                            DateTime.now(),
+                          ),
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Yorum eklendi"),
+                            showCloseIcon: true,
+                          ),
+                        );
+                        commentController.clear();
+                      },
+                      icon: Icons.add_circle_outline_sharp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

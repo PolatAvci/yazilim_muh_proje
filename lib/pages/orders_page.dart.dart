@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/order.dart';
+import 'package:yazilim_muh_proje/Models/orders_items.dart';
 import 'package:yazilim_muh_proje/pages/order_detail_page.dart';
 
 class OrdersPage extends StatefulWidget {
@@ -10,30 +10,6 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  final List<Order> orders = [
-    Order(
-      id: '1',
-      customerName: 'Ahmet Yılmaz',
-      product: 'Laptop',
-      price: 1500.0,
-      status: 'Teslim Edildi',
-    ),
-    Order(
-      id: '2',
-      customerName: 'Meryem Kılıç',
-      product: 'Telefon',
-      price: 750.0,
-      status: 'Hazırlanıyor',
-    ),
-    Order(
-      id: '3',
-      customerName: 'Ali Veli',
-      product: 'Tablet',
-      price: 1200.0,
-      status: 'Kargo Bekliyor',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,97 +31,115 @@ class _OrdersPageState extends State<OrdersPage> {
         ),
         backgroundColor: Colors.blue.shade400,
       ),
-      body: ListView.builder(
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OrderDetailPage(order: orders[index]),
+      body:
+          OrdersItems.items.isEmpty
+              ? Center(
+                child: Text(
+                  "Mevcut siparişiniz bulunmuyor",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
                 ),
-              );
-            },
-            child: Card(
-              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(10),
-                  title: Text(
-                    orders[index].product,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            'Müşteri: ',
+              )
+              : ListView.builder(
+                itemCount: OrdersItems.items.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => OrderDetailPage(
+                                order: OrdersItems.items[index],
+                              ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.all(10),
+                          title: Text(
+                            OrdersItems.items[index].name,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Colors.blue.shade700,
                             ),
                           ),
-                          Text(
-                            orders[index].customerName,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.black,
-                            ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Müşteri: ',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    OrdersItems.items[index].customerName,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Durum: ${OrdersItems.items[index].status}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: _getStatusColor(
+                                    OrdersItems.items[index].status,
+                                  ),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Durum: ${orders[index].status}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: _getStatusColor(orders[index].status),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '\$${orders[index].price.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade600,
-                        ),
-                      ),
-                      SizedBox(width: 30),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '\$${OrdersItems.items[index].price.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green.shade600,
+                                ),
+                              ),
+                              SizedBox(width: 30),
 
-                      Icon(
-                        _getStatusIcon(orders[index].status),
-                        color: _getStatusColor(orders[index].status),
-                        size: 20,
+                              Icon(
+                                _getStatusIcon(OrdersItems.items[index].status),
+                                color: _getStatusColor(
+                                  OrdersItems.items[index].status,
+                                ),
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            ),
-          );
-        },
-      ),
     );
   }
 

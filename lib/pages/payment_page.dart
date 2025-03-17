@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:yazilim_muh_proje/Models/cart_items.dart';
+import 'package:yazilim_muh_proje/Models/order.dart';
+import 'package:yazilim_muh_proje/Models/orders_items.dart';
+import 'package:yazilim_muh_proje/Models/product.dart';
 
 class PaymentPage extends StatefulWidget {
-  final List<Map<String, dynamic>> items;
+  final List<Product> items;
   final double shippingCost;
   const PaymentPage({
     super.key,
@@ -43,7 +47,7 @@ class _PaymentPageState extends State<PaymentPage> {
   double _calculateTotalPrice() {
     double total = 0.0;
     for (var item in widget.items) {
-      total += item['price'] * item["quantity"];
+      total += item.price * item.quantity;
     }
     return total + widget.shippingCost;
   }
@@ -147,6 +151,21 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
             TextButton(
               onPressed: () {
+                for (Product product in CartItems.items) {
+                  OrdersItems.items.add(
+                    Order(
+                      customerName: nameController.text,
+                      status: "Hazırlanıyor",
+                      id: product.id,
+                      category: product.category,
+                      details: product.details,
+                      name: product.name,
+                      price: product.price,
+                      image: product.image,
+                    ),
+                  );
+                }
+                CartItems.items.clear();
                 // Show success snackbar after confirmation
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

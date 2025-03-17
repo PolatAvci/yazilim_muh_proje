@@ -5,6 +5,7 @@ class Product {
   String category;
   String details;
   String image;
+  int quantity = 1;
 
   Product({
     required this.id,
@@ -14,4 +15,12 @@ class Product {
     required this.price,
     required this.image,
   });
+
+  void miktarArttir() {
+    quantity++;
+  }
+
+  void miktarAzalt() {
+    quantity--;
+  }
 }
