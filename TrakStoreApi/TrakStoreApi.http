@@ -1,0 +1,6 @@
+@TrakStoreApi_HostAddress = http://localhost:5028
+
+GET {{TrakStoreApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

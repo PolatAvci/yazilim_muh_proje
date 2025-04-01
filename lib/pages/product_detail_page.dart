@@ -3,10 +3,13 @@ import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
+import 'package:yazilim_muh_proje/Models/user.dart';
+import 'package:yazilim_muh_proje/Models/veriler.dart';
 import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
 import 'package:yazilim_muh_proje/components/comment_box.dart';
 import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
+import 'package:yazilim_muh_proje/pages/payment_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int id;
@@ -40,11 +43,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void initState() {
     super.initState();
 
-    // Favori kontrolü
     List<int> favItems = UserFavItems.getAllValuesByUserId(widget.userId);
     _isFav = favItems.contains(widget.id);
 
-    // Ürüne ait yorumları filtrele
     productComments =
         CommentItems.items
             .where((map) => map.containsKey(widget.id))
@@ -69,27 +70,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           IconButton(
             onPressed: () {
               setState(() {
-                for (int itemId in favItems) {
-                  if (itemId == widget.id) {
-                    UserFavItems.removeFavorite(widget.userId, widget.id);
-                    _isFav = false;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Ürün favorilerden çıkarıldı"),
-                        showCloseIcon: true,
-                      ),
-                    );
-                    return;
-                  }
+                if (favItems.contains(widget.id)) {
+                  UserFavItems.removeFavorite(widget.userId, widget.id);
+                  _isFav = false;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Ürün favorilerden çıkarıldı")),
+                  );
+                } else {
+                  UserFavItems.items.add({widget.userId: widget.id});
+                  _isFav = true;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Ürün favorilere eklendi")),
+                  );
                 }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Ürün favorilere eklendi"),
-                    showCloseIcon: true,
-                  ),
-                );
-                UserFavItems.items.add({widget.userId: widget.id});
-                _isFav = true;
               });
             },
             icon:
@@ -160,16 +153,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          for (Product product in CartItems.items) {
-                            if (product.id == widget.id) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Ürün sepetinizde zaten var"),
-                                  showCloseIcon: true,
-                                ),
-                              );
-                              return;
-                            }
+                          if (CartItems.items.any(
+                            (product) => product.id == widget.id,
+                          )) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün sepetinizde zaten var"),
+                              ),
+                            );
+                            return;
                           }
                           CartItems.items.add(
                             Product(
@@ -182,18 +174,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             ),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Ürün sepetinize eklendi"),
-                              showCloseIcon: true,
-                            ),
+                            SnackBar(content: Text("Ürün sepete eklendi")),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue.shade400,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
                         ),
                         child: Text(
                           "Sepete Ekle",
@@ -201,13 +186,33 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          if (Veriler.kullanicilar.any(
+                            (user) =>
+                                user.email == "deneme@gmail.com" &&
+                                user.password == "1221",
+                          )) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => PaymentPage(
+                                      shippingCost: 20.0,
+                                      items: CartItems.items,
+                                    ),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Lütfen giriş yapın"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade700,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
                         ),
                         child: Text(
                           "Hemen Satın Al",
@@ -217,68 +222,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ],
                   ),
                   Divider(),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Yorumlar",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            if (productComments.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Bu ürüne henüz yorum yapılmamış.",
-                                  ),
-                                  showCloseIcon: true,
-                                ),
-                              );
-                              return;
-                            }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => AllCommentPage(id: widget.id),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            "Tümünü gör",
-                            style: TextStyle(color: Colors.blue.shade400),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  productComments.isEmpty
-                      ? Text("Bu ürüne henüz yorum yapılmamış")
-                      : SizedBox(
-                        height: 140,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount:
-                              productComments.length >= 5
-                                  ? 5
-                                  : productComments.length,
-                          shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          itemBuilder: (context, i) {
-                            return CommentBox(
-                              text: productComments[i].text,
-                              star: productComments[i].star,
-                              date: productComments[i].date,
-                            );
-                          },
-                        ),
-                      ),
                 ],
               ),
             ),

@@ -136,7 +136,12 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: Icon(Icons.exit_to_app, color: Colors.blue.shade400),
               title: Text("Oturumu kapat"),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
             ),
           ],
         ),
