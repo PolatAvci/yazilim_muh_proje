@@ -14,7 +14,6 @@ class AllCommentPage extends StatelessWidget {
         .toList();
   }
 
-  // Method to draw stars for rating
   Widget buildStarRating(int starCount) {
     List<Widget> stars = [];
     for (int i = 0; i < 5; i++) {
@@ -95,9 +94,7 @@ class AllCommentPage extends StatelessWidget {
                       ),
                       subtitle: Row(
                         children: [
-                          buildStarRating(
-                            comment.star,
-                          ), // Call the star rating method
+                          buildStarRating(comment.star),
                           SizedBox(width: 4),
                           Text(
                             comment.star.toString(),

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\erdem\\OneDrive\\Desktop\\yazlımsonuncukodlar\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj": {}
+    "C:\\Users\\erdem\\OneDrive\\Desktop\\yazılım proje\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\erdem\\OneDrive\\Desktop\\yazlımsonuncukodlar\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj": {
+    "C:\\Users\\erdem\\OneDrive\\Desktop\\yazılım proje\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazlımsonuncukodlar\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj",
+        "projectUniqueName": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazılım proje\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj",
         "projectName": "TrakStoreApi",
-        "projectPath": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazlımsonuncukodlar\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj",
+        "projectPath": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazılım proje\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj",
         "packagesPath": "C:\\Users\\erdem\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazlımsonuncukodlar\\yazilim_muh_proje\\TrakStoreApi\\obj\\",
+        "outputPath": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazılım proje\\yazilim_muh_proje\\TrakStoreApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\erdem\\AppData\\Roaming\\NuGet\\NuGet.Config",

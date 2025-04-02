@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vWwdOjLTGHs=",
+  "dgSpecHash": "QldZyX6IL7U=",
   "success": true,
-  "projectFilePath": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazlımsonuncukodlar\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj",
+  "projectFilePath": "C:\\Users\\erdem\\OneDrive\\Desktop\\yazılım proje\\yazilim_muh_proje\\TrakStoreApi\\TrakStoreApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\erdem\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\erdem\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

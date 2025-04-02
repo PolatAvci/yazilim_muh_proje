@@ -3,6 +3,7 @@ import 'package:yazilim_muh_proje/Models/comment.dart';
 class CommentItems {
   static List<Map<int, Comment>> items = [
     {1: Comment("Çok güzel.", 5, DateTime(2025, 1, 1))},
+    {1: Comment("İdare eder.", 3, DateTime(2025, 4, 2))},
     {
       1: Comment(
         "Kızıma hediye olarak aldım. Çok beğendi.",

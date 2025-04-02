@@ -3,13 +3,12 @@ import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
-import 'package:yazilim_muh_proje/Models/user.dart';
-import 'package:yazilim_muh_proje/Models/veriler.dart';
 import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
-import 'package:yazilim_muh_proje/components/comment_box.dart';
+import 'package:yazilim_muh_proje/Models/veriler.dart';
 import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
 import 'package:yazilim_muh_proje/pages/payment_page.dart';
+import 'package:intl/intl.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int id;
@@ -42,10 +41,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
-
     List<int> favItems = UserFavItems.getAllValuesByUserId(widget.userId);
     _isFav = favItems.contains(widget.id);
-
     productComments =
         CommentItems.items
             .where((map) => map.containsKey(widget.id))
@@ -148,6 +145,141 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   SizedBox(height: 8),
                   Text(widget.details, style: TextStyle(fontSize: 16)),
                   SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Yorumlar",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Spacer(),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              AllCommentPage(id: widget.id),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue.shade600,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Tüm Yorumları Gör",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+
+                  productComments.isNotEmpty
+                      ? SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children:
+                              productComments
+                                  .take(4)
+                                  .map(
+                                    (comment) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0,
+                                      ),
+                                      child: Card(
+                                        elevation: 4,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  SizedBox(width: 4),
+                                                  Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.star,
+                                                            color:
+                                                                Colors
+                                                                    .yellow
+                                                                    .shade700,
+                                                          ),
+                                                          Text(comment.text),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        width: 8,
+                                                        height: 10,
+                                                      ),
+                                                      Container(
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              DateFormat(
+                                                                'dd/MM/yyyy',
+                                                              ).format(
+                                                                comment.date,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                        ),
+                      )
+                      : Text(
+                        "Henüz yorum yapılmadı.",
+                        style: TextStyle(fontSize: 16),
+                      ),
+
+                  SizedBox(height: 8),
+
+                  SizedBox(height: 20),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -187,29 +319,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          if (Veriler.kullanicilar.any(
-                            (user) =>
-                                user.email == "deneme@gmail.com" &&
-                                user.password == "1221",
-                          )) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => PaymentPage(
-                                      shippingCost: 20.0,
-                                      items: CartItems.items,
-                                    ),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Lütfen giriş yapın"),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => PaymentPage(
+                                    shippingCost: 20.0,
+                                    items: CartItems.items,
+                                  ),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade700,
