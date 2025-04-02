@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "wjjphrDm5L0eLitVIP/fKfvxW6r3u4+2LBk5zzY8blk=",
+  "Hash": "jHuVYP/31ONWggQS4MCtEX5Uka5/pyJsIkKG1To7yvg=",
   "Source": "TrakStoreApi",
   "BasePath": "_content/TrakStoreApi",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

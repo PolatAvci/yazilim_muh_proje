@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/veriler.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 import 'package:yazilim_muh_proje/Models/user.dart';
@@ -18,6 +17,13 @@ class RegisterPage extends StatelessWidget {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}
+/*
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,3 +243,4 @@ class RegisterPage extends StatelessWidget {
     );
   }
 }
+*/

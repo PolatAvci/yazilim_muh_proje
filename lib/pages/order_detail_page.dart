@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/comment.dart';
-import 'package:yazilim_muh_proje/Models/comment_items.dart';
+import 'package:http/http.dart' as http;
 import 'package:yazilim_muh_proje/Models/order.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final Order order;
 
-  OrderDetailPage({super.key, required this.order});
+  const OrderDetailPage({super.key, required this.order});
 
   @override
   State<OrderDetailPage> createState() => _OrderDetailPageState();
@@ -44,7 +43,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           children: [
             _buildCard(
               'Müşteri Adı:',
-              widget.order.customerName,
+              "Sabit ad",
               Colors.black,
               FontWeight.bold,
             ),
@@ -129,14 +128,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       buttonColor: Colors.blue.shade400,
                       fontSize: 15,
                       textColor: Colors.white,
-                      onPressed: () {
-                        CommentItems.items.add({
-                          widget.order.id: Comment(
-                            commentController.text,
-                            star,
-                            DateTime.now(),
-                          ),
-                        });
+                      onPressed: () async {
+                        http.post(
+                          Uri.parse("https://localhost:7212/api/Comment"),
+                          body: {
+                            "date": DateTime.now(),
+                            "star": star,
+                            "text": commentController.text,
+                          },
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("Yorum eklendi"),

@@ -1,21 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
-import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
-import 'package:yazilim_muh_proje/Models/user.dart';
-import 'package:yazilim_muh_proje/Models/veriler.dart';
-import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
-import 'package:yazilim_muh_proje/components/comment_box.dart';
-import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
-import 'package:yazilim_muh_proje/pages/payment_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int id;
   final int userId;
   final String name;
-  final String category;
   final String details;
   final String imagePath;
   final double price;
@@ -25,7 +19,6 @@ class ProductDetailPage extends StatefulWidget {
     required this.id,
     required this.userId,
     required this.name,
-    required this.category,
     required this.details,
     required this.imagePath,
     required this.price,
@@ -36,26 +29,76 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  late bool _isFav;
-  late List<Comment> productComments;
+  late bool _isFav = false;
+  late List<Comment> productComments = [];
+  late List<Map<String, dynamic>> userFavItem = [];
+
+  _isFavItem() {
+    for (var item in userFavItem) {
+      if (item["product"]["id"] == widget.id) {
+        setState(() {
+          _isFav = true;
+          return;
+        });
+      }
+    }
+    _isFav = false;
+  }
+
+  Future<void> _getAllUserFavItems() async {
+    final response = await http.get(
+      Uri.parse("https://localhost:7212/api/UserFavItem"),
+    );
+    if (response.statusCode == 200) {
+      userFavItem = json.decode(response.body);
+    }
+  }
+
+  Future<void> _getComments() async {
+    final response = await http.get(
+      Uri.parse("https://localhost:7212/api/CommentProduct/${widget.id}"),
+    );
+
+    if (response.statusCode == 200) {
+      for (var item in json.decode(response.body)) {
+        productComments.add(Comment.fromJson(item));
+      }
+    }
+  }
+
+  Future<void> _removeFav() async {
+    final response = await http.delete(
+      Uri.parse(
+        "https://localhost:7212/api/UserFavItem/${widget.userId}/${widget.id}",
+      ),
+    );
+    _getAllUserFavItems();
+  }
+
+  Future<void> _addFav() async {
+    final response = await http.post(
+      Uri.parse("https://localhost:7212/api/UserFavItem"),
+      body: {"userId": widget.userId, "productId": widget.id},
+    );
+    _getAllUserFavItems();
+  }
 
   @override
   void initState() {
     super.initState();
 
-    List<int> favItems = UserFavItems.getAllValuesByUserId(widget.userId);
-    _isFav = favItems.contains(widget.id);
-
-    productComments =
-        CommentItems.items
-            .where((map) => map.containsKey(widget.id))
-            .map((map) => map[widget.id]!)
-            .toList();
+    _getAllUserFavItems();
+    _isFavItem();
+    _getComments();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    List<int> favItems = UserFavItems.getAllValuesByUserId(widget.userId);
+    List<int> favItems = [];
+    for (var item in userFavItem) {
+      favItems.add(item["product"]["id"]);
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue.shade400,
@@ -71,13 +114,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             onPressed: () {
               setState(() {
                 if (favItems.contains(widget.id)) {
-                  UserFavItems.removeFavorite(widget.userId, widget.id);
+                  _removeFav();
                   _isFav = false;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Ürün favorilerden çıkarıldı")),
                   );
                 } else {
-                  UserFavItems.items.add({widget.userId: widget.id});
+                  _addFav();
                   _isFav = true;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Ürün favorilere eklendi")),
@@ -94,7 +137,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CartPage()),
+                MaterialPageRoute(
+                  builder: (context) => CartPage(userId: widget.userId),
+                ),
               );
             },
             icon: Icon(Icons.shopping_cart, color: Colors.white),
@@ -128,7 +173,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "Kategori: ${widget.category}",
+                    "Kategori: Sonra eklenecek",
                     style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                   ),
                   SizedBox(height: 8),
@@ -166,11 +211,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           CartItems.items.add(
                             Product(
                               id: widget.id,
-                              category: widget.category,
                               details: widget.details,
                               name: widget.name,
                               price: widget.price,
                               image: widget.imagePath,
+                              productCategories: [], //ŞİMDİLİK BOŞ
                             ),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -186,31 +231,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          if (Veriler.kullanicilar.any(
-                            (user) =>
-                                user.email == "deneme@gmail.com" &&
-                                user.password == "1221",
-                          )) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => PaymentPage(
-                                      shippingCost: 20.0,
-                                      items: CartItems.items,
-                                    ),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Lütfen giriş yapın"),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
+                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade700,
                         ),

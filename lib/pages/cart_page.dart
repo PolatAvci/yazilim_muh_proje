@@ -5,7 +5,8 @@ import 'package:yazilim_muh_proje/components/cart_item.dart';
 import 'package:yazilim_muh_proje/pages/payment_page.dart';
 
 class CartPage extends StatefulWidget {
-  const CartPage({super.key});
+  final int userId;
+  const CartPage({super.key, required this.userId});
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -98,6 +99,7 @@ class _CartPageState extends State<CartPage> {
                           (context) => PaymentPage(
                             items: CartItems.items,
                             shippingCost: shippingCost,
+                            userId: widget.userId,
                           ),
                     ),
                   );

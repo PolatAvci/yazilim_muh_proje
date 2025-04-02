@@ -1,15 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/orders_items.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:yazilim_muh_proje/Models/order.dart';
 import 'package:yazilim_muh_proje/pages/order_detail_page.dart';
 
 class OrdersPage extends StatefulWidget {
-  const OrdersPage({super.key});
+  final int userId;
+  const OrdersPage({super.key, required this.userId});
 
   @override
   State<OrdersPage> createState() => _OrdersPageState();
 }
 
 class _OrdersPageState extends State<OrdersPage> {
+  List<Order> _orders = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOrders();
+  }
+
+  Future<void> _fetchOrders() async {
+    final response = await http.get(
+      Uri.parse('https://localhost:7212/api/UserProduct/${widget.userId}'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _orders = data.map((json) => Order.fromJson(json)).toList();
+        _isLoading = false;
+      });
+    } else {
+      // Hata durumunda bir işlem yapılabilir
+      setState(() {
+        _isLoading = false;
+      });
+      throw Exception('Failed to load orders');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +65,9 @@ class _OrdersPageState extends State<OrdersPage> {
         backgroundColor: Colors.blue.shade400,
       ),
       body:
-          OrdersItems.items.isEmpty
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _orders.isEmpty
               ? Center(
                 child: Text(
                   "Mevcut siparişiniz bulunmuyor",
@@ -43,7 +78,7 @@ class _OrdersPageState extends State<OrdersPage> {
                 ),
               )
               : ListView.builder(
-                itemCount: OrdersItems.items.length,
+                itemCount: _orders.length,
                 itemBuilder: (context, index) {
                   return InkWell(
                     onTap: () {
@@ -51,9 +86,8 @@ class _OrdersPageState extends State<OrdersPage> {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (context) => OrderDetailPage(
-                                order: OrdersItems.items[index],
-                              ),
+                              (context) =>
+                                  OrderDetailPage(order: _orders[index]),
                         ),
                       );
                     },
@@ -68,7 +102,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         child: ListTile(
                           contentPadding: EdgeInsets.all(10),
                           title: Text(
-                            OrdersItems.items[index].name,
+                            _orders[index].name,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -90,7 +124,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                     ),
                                   ),
                                   Text(
-                                    OrdersItems.items[index].customerName,
+                                    "Sabit Ad",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.normal,
@@ -101,12 +135,10 @@ class _OrdersPageState extends State<OrdersPage> {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                'Durum: ${OrdersItems.items[index].status}',
+                                'Durum: ${_orders[index].status}',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: _getStatusColor(
-                                    OrdersItems.items[index].status,
-                                  ),
+                                  color: _getStatusColor(_orders[index].status),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -116,7 +148,7 @@ class _OrdersPageState extends State<OrdersPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '\$${OrdersItems.items[index].price.toStringAsFixed(2)}',
+                                '\$${_orders[index].price.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -124,12 +156,9 @@ class _OrdersPageState extends State<OrdersPage> {
                                 ),
                               ),
                               SizedBox(width: 30),
-
                               Icon(
-                                _getStatusIcon(OrdersItems.items[index].status),
-                                color: _getStatusColor(
-                                  OrdersItems.items[index].status,
-                                ),
+                                _getStatusIcon(_orders[index].status),
+                                color: _getStatusColor(_orders[index].status),
                                 size: 20,
                               ),
                             ],

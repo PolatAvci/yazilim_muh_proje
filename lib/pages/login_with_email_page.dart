@@ -3,7 +3,6 @@ import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 import 'package:yazilim_muh_proje/pages/register_page.dart';
 import 'package:yazilim_muh_proje/pages/kullanim_kosullari_page.dart';
 import 'package:yazilim_muh_proje/Models/user.dart';
-import 'package:yazilim_muh_proje/Models/veriler.dart';
 
 class LoginWithEmailPage extends StatefulWidget {
   const LoginWithEmailPage({super.key});
@@ -25,6 +24,13 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
     _password.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}
+/*
   Widget _buildErrorText(bool isValid) {
     return isValid
         ? Row(
@@ -216,3 +222,4 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 }
+*/

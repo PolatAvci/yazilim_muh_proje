@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
+import 'package:http/http.dart' as http;
 
 class ProductCard extends StatefulWidget {
   final Widget image;
@@ -30,27 +32,38 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  late List<int> _userFavsId; // initialize it later
-  late bool _isFav;
+  late bool _isFav = false;
 
-  bool _getIsFav() {
-    _userFavsId = UserFavItems.getAllValuesByUserId(widget.userId);
-    for (int i = 0; i < _userFavsId.length; i++) {
-      if (_userFavsId[i] == widget.id) {
-        return true;
+  Future<bool> _getIsFav() async {
+    final response = await http.get(
+      Uri.parse('https://localhost:7212/api/UserFavItem/${widget.userId}'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> favItems = json.decode(response.body);
+      for (var item in favItems) {
+        if (item['productId'] == widget.id) {
+          return true;
+        }
       }
+      return false;
+    } else {
+      throw Exception('Failed to load favorites');
     }
-    return false;
   }
 
   @override
   void initState() {
     super.initState();
+    _getIsFav().then((value) {
+      setState(() {
+        _isFav = value;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    _isFav = _getIsFav();
     return InkWell(
       onTap: widget.onpressed,
       child: Padding(
@@ -77,28 +90,64 @@ class _ProductCardState extends State<ProductCard> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
                           _isFav = !_isFav;
                         });
-                        if (!_isFav) {
-                          UserFavItems.removeFavorite(widget.userId, widget.id);
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Ürün favorilerden çıkarıldı."),
-                              showCloseIcon: true,
+                        if (_isFav) {
+                          // Favoriye ekle
+                          final response = await http.post(
+                            Uri.parse('https://localhost:7212/api/UserFavItem'),
+                            body: json.encode({
+                              'userId': widget.userId,
+                              'productId': widget.id,
+                            }),
+                          );
+
+                          if (response.statusCode == 201) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün favorilere eklendi."),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Favoriye eklenirken bir hata oluştu.",
+                                ),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          }
+                        } else {
+                          // Favorilerden çıkar
+                          final response = await http.delete(
+                            Uri.parse(
+                              'https://localhost:7212/api/UserFavItem/${widget.userId}/${widget.id}',
                             ),
                           );
-                          return;
+
+                          if (response.statusCode == 200) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün favorilerden çıkarıldı."),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Favorilerden çıkarılırken bir hata oluştu.",
+                                ),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          }
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Ürün favorilere eklendi."),
-                            showCloseIcon: true,
-                          ),
-                        );
-                        UserFavItems.items.add({widget.userId: widget.id});
                       },
                       icon: Icon(
                         _isFav

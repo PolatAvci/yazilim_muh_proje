@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/product_items.dart';
+import 'package:http/http.dart' as http;
 import 'package:yazilim_muh_proje/components/product_card.dart';
 import 'package:yazilim_muh_proje/pages/address_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
@@ -18,6 +20,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final int _userId = 1; //login yapılmış gibi göstermek için
+  late List<Map<String, dynamic>> products = [];
+
+  Future<void> getProducts() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://localhost:7212/api/Product'),
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          products = List<Map<String, dynamic>>.from(data);
+        });
+      }
+    } catch (e) {
+      print("Hata: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    getProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +117,9 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context); // Drawer kapatmak için
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => OrdersPage()),
+                  MaterialPageRoute(
+                    builder: (context) => OrdersPage(userId: _userId),
+                  ),
                 );
               },
             ),
@@ -173,7 +203,9 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CartPage()),
+                  MaterialPageRoute(
+                    builder: (context) => CartPage(userId: _userId),
+                  ),
                 );
               },
               icon: Icon(Icons.shopping_cart, color: Colors.white),
@@ -181,51 +213,56 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: SizedBox(
-        height: 350,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: ProductItems.items.length,
-          itemBuilder: (context, i) {
-            var item = ProductItems.items[i];
-            return SizedBox(
-              width: 200,
-              child: ProductCard(
-                id: item.id,
-                userId: _userId,
-                category: item.category,
-                details: item.category,
-                imagePath: item.image,
-                image: SizedBox(
-                  height: 250,
-                  child: Image.asset(item.image, fit: BoxFit.contain),
-                ),
-                name: item.name,
-                price: item.price,
-                onpressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => ProductDetailPage(
-                            id: item.id,
-                            userId: _userId,
-                            name: item.name,
-                            category: item.category,
-                            details: item.details,
-                            imagePath: item.image,
-                            price: item.price,
+      body:
+          products.isEmpty
+              ? CircularProgressIndicator()
+              : SizedBox(
+                height: 350,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: products.length,
+                  itemBuilder: (context, i) {
+                    var item = products[i];
+                    return SizedBox(
+                      width: 200,
+                      child: ProductCard(
+                        id: item["id"],
+                        userId: _userId,
+                        category: "Sonra kaldırılacak",
+                        details: item["details"],
+                        imagePath: item["image"],
+                        image: SizedBox(
+                          height: 250,
+                          child: Image.asset(
+                            item["image"],
+                            fit: BoxFit.contain,
                           ),
-                    ),
-                  ).then((value) {
-                    setState(() {});
-                  });
-                },
+                        ),
+                        name: item["name"],
+                        price: item["price"],
+                        onpressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ProductDetailPage(
+                                    id: item["id"],
+                                    userId: _userId,
+                                    name: item["name"],
+                                    details: item["details"],
+                                    imagePath: item["image"],
+                                    price: item["price"],
+                                  ),
+                            ),
+                          ).then((value) {
+                            setState(() {});
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
-            );
-          },
-        ),
-      ),
     );
   }
 }
