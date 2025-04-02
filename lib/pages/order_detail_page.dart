@@ -7,7 +7,7 @@ import 'package:yazilim_muh_proje/components/button.dart';
 class OrderDetailPage extends StatefulWidget {
   final Order order;
 
-  OrderDetailPage({super.key, required this.order});
+  const OrderDetailPage({super.key, required this.order});
 
   @override
   State<OrderDetailPage> createState() => _OrderDetailPageState();
