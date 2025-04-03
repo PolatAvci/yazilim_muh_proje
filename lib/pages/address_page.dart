@@ -1,33 +1,31 @@
 import "package:flutter/material.dart";
 import 'package:yazilim_muh_proje/Models/address.dart';
+import 'package:yazilim_muh_proje/Services/address_service.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 
 class AddressPage extends StatefulWidget {
-  const AddressPage({super.key});
+  final int userId;
+  List<Address> adresler = [];
+  AddressPage({super.key, required this.userId});
 
   @override
   State<AddressPage> createState() => _AddressPageState();
 }
 
 class _AddressPageState extends State<AddressPage> {
-  List<Address> adresler = [
-    Address(id: "1", address: "İstiklal Caddesi No:5", sehir: "İstanbul"),
-    Address(id: "2", address: "Atatürk Bulvarı No:12", sehir: "Ankara"),
-    Address(id: "3", address: "Konak Mah. 123. Sokak", sehir: "İzmir"),
-  ];
   final _cityController = TextEditingController();
   final _addressController = TextEditingController();
 
   void _saveAddress() {
     if (_addressController.text.isNotEmpty && _cityController.text.isNotEmpty) {
       final newAddress = Address(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: 1, //DateTime.now().millisecondsSinceEpoch.toString(),
         address: _addressController.text,
         sehir: _cityController.text,
       );
 
-      adresler.add(newAddress);
+      widget.adresler.add(newAddress);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -47,12 +45,23 @@ class _AddressPageState extends State<AddressPage> {
 
   void _deleteAddress(Address address) {
     setState(() {
-      adresler.removeWhere((a) => a.id == address.id);
+      widget.adresler.removeWhere((a) => a.id == address.id);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Adres silindi'), showCloseIcon: true),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    AddressService.getAddresses(widget.userId).then((value) {
+      setState(() {
+        widget.adresler = value;
+      });
+    });
   }
 
   @override
@@ -141,7 +150,7 @@ class _AddressPageState extends State<AddressPage> {
         ),
       ),
       body:
-          adresler.isEmpty
+          widget.adresler.isEmpty
               ? const Center(
                 child: Text(
                   "Adres bulunamadı",
@@ -153,9 +162,9 @@ class _AddressPageState extends State<AddressPage> {
                 ),
               )
               : ListView.builder(
-                itemCount: adresler.length,
+                itemCount: widget.adresler.length,
                 itemBuilder: (context, index) {
-                  final address = adresler[index];
+                  final address = widget.adresler[index];
                   return Row(
                     children: [
                       Expanded(

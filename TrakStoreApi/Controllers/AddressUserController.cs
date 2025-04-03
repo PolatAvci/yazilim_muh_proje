@@ -26,13 +26,14 @@ namespace TrakStoreApi.Controllers
         }
 
         // GET: api/AddressUser/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AddressUser>> GetAddressUser(int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<List<AddressUser>>> GetAddressUser(int userId)
         {
             var addressUser = await _context.AddressUsers
                 .Include(au => au.User)
                 .Include(au => au.Address)
-                .FirstOrDefaultAsync(au => au.UserId == id);
+                .Where(au => au.UserId == userId)
+                .ToListAsync();
 
             if (addressUser == null)
             {
