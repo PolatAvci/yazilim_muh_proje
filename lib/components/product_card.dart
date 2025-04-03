@@ -13,8 +13,9 @@ class ProductCard extends StatefulWidget {
   final String details;
   final String imagePath;
   final int userId;
+  bool isFav = false;
 
-  const ProductCard({
+  ProductCard({
     super.key,
     required this.id,
     required this.category,
@@ -32,13 +33,10 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  late bool _isFav = false;
-
   Future<bool> _getIsFav() async {
     final response = await http.get(
       Uri.parse('https://localhost:7212/api/UserFavItem/${widget.userId}'),
     );
-
     if (response.statusCode == 200) {
       List<dynamic> favItems = json.decode(response.body);
       for (var item in favItems) {
@@ -57,7 +55,7 @@ class _ProductCardState extends State<ProductCard> {
     super.initState();
     _getIsFav().then((value) {
       setState(() {
-        _isFav = value;
+        widget.isFav = value;
       });
     });
   }
@@ -92,13 +90,17 @@ class _ProductCardState extends State<ProductCard> {
                     IconButton(
                       onPressed: () async {
                         setState(() {
-                          _isFav = !_isFav;
+                          widget.isFav = !widget.isFav;
                         });
 
-                        if (_isFav) {
+                        if (widget.isFav) {
                           // Favoriye ekle
                           final response = await http.post(
                             Uri.parse('https://localhost:7212/api/UserFavItem'),
+                            headers: {
+                              'Content-Type':
+                                  'application/json', // JSON formatında gönderildiğini belirt
+                            },
                             body: json.encode({
                               'userId': widget.userId,
                               'productId': widget.id,
@@ -130,7 +132,7 @@ class _ProductCardState extends State<ProductCard> {
                             ),
                           );
 
-                          if (response.statusCode == 200) {
+                          if (response.statusCode == 204) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Ürün favorilerden çıkarıldı."),
@@ -150,10 +152,10 @@ class _ProductCardState extends State<ProductCard> {
                         }
                       },
                       icon: Icon(
-                        _isFav
+                        widget.isFav
                             ? Icons.favorite
                             : Icons.favorite_border_outlined,
-                        color: _isFav ? Colors.red : Colors.grey,
+                        color: widget.isFav ? Colors.red : Colors.grey,
                       ),
                     ),
                   ],

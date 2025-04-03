@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TrakStoreApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+47ec728df5e57b03ccfc45db4f53f3ed60e3c8ae")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+18f76ce4b1a2272bad06e16c70f98cab340c2728")]
 [assembly: System.Reflection.AssemblyProductAttribute("TrakStoreApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TrakStoreApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

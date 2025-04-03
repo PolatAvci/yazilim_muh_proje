@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,13 +33,14 @@ namespace TrakStoreApi.Controllers
         }
 
         // GET: api/UserFavItem/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserFavItem>> GetUserFavItem(int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<List<UserFavItem>>> GetUserFavItem(int userId)
         {
             var userFavItem = await _context.UserFavItems
                 .Include(u => u.User)
                 .Include(u => u.Product)
-                .FirstOrDefaultAsync(uf => uf.UserId == id);
+                .Where(uf => uf.UserId == userId)
+                .ToListAsync();
 
             if (userFavItem == null)
             {
@@ -50,22 +52,30 @@ namespace TrakStoreApi.Controllers
 
         // POST: api/UserFavItem
         [HttpPost]
-        public async Task<ActionResult<UserFavItem>> PostUserFavItem(UserFavItem userFavItem)
+        public async Task<IActionResult> PostUserFavItem([FromBody] UserFavItem userFavItem)
         {
-            // Aynı kullanıcı ve ürün kombinasyonunun daha önce favorilere eklenip eklenmediğini kontrol et
-            var existingFavItem = await _context.UserFavItems
-                .FirstOrDefaultAsync(uf => uf.UserId == userFavItem.UserId && uf.ProductId == userFavItem.ProductId);
-
-            if (existingFavItem != null)
+            try
             {
-                return BadRequest("Bu ürün zaten favorilerde.");
+                // Aynı kullanıcı ve ürün kombinasyonunun daha önce favorilere eklenip eklenmediğini kontrol et
+                var existingFavItem = await _context.UserFavItems
+                    .FirstOrDefaultAsync(uf => uf.UserId == userFavItem.UserId && uf.ProductId == userFavItem.ProductId);
+
+                if (existingFavItem != null)
+                {
+                    return BadRequest("Bu ürün zaten favorilerde.");
+                }
+
+                _context.UserFavItems.Add(userFavItem);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetUserFavItem), new { userId = userFavItem.UserId }, userFavItem);
             }
-
-            _context.UserFavItems.Add(userFavItem);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUserFavItem", new { id = userFavItem.UserId }, userFavItem);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
+
 
         // DELETE: api/UserFavItem/5
         [HttpDelete("{userId}/{productId}")]
