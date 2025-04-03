@@ -1,8 +1,8 @@
 import 'package:yazilim_muh_proje/Models/product.dart';
-import 'package:yazilim_muh_proje/Models/product_category.dart';
 
 class Order extends Product {
   final String status;
+  final DateTime date;
 
   Order({
     required this.status,
@@ -12,23 +12,19 @@ class Order extends Product {
     required super.name,
     required super.price,
     required super.image,
+    required this.date,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
-      id: json['id'],
-      name: json['name'],
-      price: json['price'].toDouble(),
-      details: json['details'],
-      image: json['image'],
+      id: json['productId'],
+      name: json['product']['name'],
+      price: json['product']['price'].toDouble(),
+      details: json['product']['details'],
+      image: json['product']['image'],
       status: json['status'],
-      productCategories:
-          (json['productCategories'] as List)
-              .map((e) => ProductCategory.fromJson(e))
-              .where(
-                (pc) => pc.productId == json['id'],
-              ) // Yalnızca bu ürüne ait kategorileri al
-              .toList(),
+      productCategories: [],
+      date: DateTime.parse(json['date']),
     );
   }
 
