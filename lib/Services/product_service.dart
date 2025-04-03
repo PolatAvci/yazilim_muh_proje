@@ -13,14 +13,14 @@ class ProductService {
         return List<Map<String, dynamic>>.from(data);
       }
     } catch (e) {
-      print("Hata: $e");
+      return null;
     }
     return null;
   }
 
   static Future<bool> getIsFav(int userId, int productId) async {
     final response = await http.get(
-      Uri.parse('https://localhost:7212/api/UserFavItem/${userId}'),
+      Uri.parse('https://localhost:7212/api/UserFavItem/$userId'),
     );
     if (response.statusCode == 200) {
       List<dynamic> favItems = json.decode(response.body);
@@ -49,10 +49,25 @@ class ProductService {
 
   static Future<http.Response> removeFav(int userId, int productId) async {
     final response = await http.delete(
-      Uri.parse(
-        'https://localhost:7212/api/UserFavItem/${userId}/${productId}',
-      ),
+      Uri.parse('https://localhost:7212/api/UserFavItem/$userId/$productId'),
     );
     return response;
+  }
+
+  static Future<List<dynamic>?> getAllFav(int userId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://localhost:7212/api/UserFavItem/$userId'),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+
+        return data;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
   }
 }
