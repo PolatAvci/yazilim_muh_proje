@@ -13,6 +13,7 @@ class ProductService {
         return List<Map<String, dynamic>>.from(data);
       }
     } catch (e) {
+      print(e);
       return null;
     }
     return null;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:yazilim_muh_proje/Models/order.dart';
+import 'package:yazilim_muh_proje/Services/comment_service.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 
 class OrderDetailPage extends StatefulWidget {
@@ -129,20 +130,27 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       fontSize: 15,
                       textColor: Colors.white,
                       onPressed: () async {
-                        http.post(
-                          Uri.parse("https://localhost:7212/api/Comment"),
-                          body: {
-                            "date": DateTime.now(),
-                            "star": star,
-                            "text": commentController.text,
-                          },
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Yorum eklendi"),
-                            showCloseIcon: true,
-                          ),
-                        );
+                        CommentService.addComment(
+                          star,
+                          commentController.text,
+                        ).then((response) {
+                          if (response.statusCode == 201) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Yorum eklendi"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Hata: Yorum eklenemedi"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          }
+                        });
+
                         setState(() {
                           star = 0;
                         });
