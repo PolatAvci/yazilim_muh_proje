@@ -50,7 +50,7 @@ namespace TrakStoreApi.Controllers
             _context.AddressUsers.Add(addressUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetAddressUser), new { id = addressUser.UserId }, addressUser);
+            return CreatedAtAction(nameof(GetAddressUser), new { userId = addressUser.UserId }, addressUser);
         }
 
         // PUT: api/AddressUser/5
