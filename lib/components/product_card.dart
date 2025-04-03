@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:yazilim_muh_proje/Services/Product_service.dart';
 
 class ProductCard extends StatefulWidget {
   final Widget image;
@@ -33,27 +31,21 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  Future<bool> _getIsFav() async {
-    final response = await http.get(
-      Uri.parse('https://localhost:7212/api/UserFavItem/${widget.userId}'),
-    );
-    if (response.statusCode == 200) {
-      List<dynamic> favItems = json.decode(response.body);
-      for (var item in favItems) {
-        if (item['productId'] == widget.id) {
-          return true;
-        }
-      }
-      return false;
-    } else {
-      throw Exception('Failed to load favorites');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _getIsFav().then((value) {
+    ProductService.getIsFav(widget.userId, widget.id).then((value) {
+      setState(() {
+        widget.isFav = value;
+      });
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    ProductService.getIsFav(widget.userId, widget.id).then((value) {
       setState(() {
         widget.isFav = value;
       });
@@ -95,16 +87,9 @@ class _ProductCardState extends State<ProductCard> {
 
                         if (widget.isFav) {
                           // Favoriye ekle
-                          final response = await http.post(
-                            Uri.parse('https://localhost:7212/api/UserFavItem'),
-                            headers: {
-                              'Content-Type':
-                                  'application/json', // JSON formatında gönderildiğini belirt
-                            },
-                            body: json.encode({
-                              'userId': widget.userId,
-                              'productId': widget.id,
-                            }),
+                          final response = await ProductService.addFav(
+                            widget.userId,
+                            widget.id,
                           );
 
                           if (response.statusCode == 201) {
@@ -126,10 +111,9 @@ class _ProductCardState extends State<ProductCard> {
                           }
                         } else {
                           // Favorilerden çıkar
-                          final response = await http.delete(
-                            Uri.parse(
-                              'https://localhost:7212/api/UserFavItem/${widget.userId}/${widget.id}',
-                            ),
+                          final response = await ProductService.removeFav(
+                            widget.userId,
+                            widget.id,
                           );
 
                           if (response.statusCode == 204) {

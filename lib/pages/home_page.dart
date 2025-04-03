@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:yazilim_muh_proje/Services/Product_service.dart';
 import 'package:yazilim_muh_proje/components/product_card.dart';
 import 'package:yazilim_muh_proje/pages/address_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
@@ -12,7 +10,8 @@ import 'package:yazilim_muh_proje/pages/orders_page.dart.dart';
 import 'package:yazilim_muh_proje/pages/product_detail_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  List<Map<String, dynamic>>? products = [];
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,30 +19,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final int _userId = 1; //login yapılmış gibi göstermek için
-  late List<Map<String, dynamic>> products = [];
-
-  Future<void> getProducts() async {
-    try {
-      final response = await http.get(
-        Uri.parse('https://localhost:7212/api/Product'),
-      );
-      if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-        setState(() {
-          products = List<Map<String, dynamic>>.from(data);
-        });
-      }
-    } catch (e) {
-      print("Hata: $e");
-    }
-  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    getProducts();
+    ProductService.getProducts().then((value) {
+      setState(() {
+        widget.products = value;
+      });
+    });
   }
 
   @override
@@ -92,7 +78,9 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => LoginPage()),
-                        );
+                        ).then((_) {
+                          setState(() {});
+                        });
                       },
                       child: Text(
                         "Kayıt ol / Giriş yap",
@@ -120,7 +108,10 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) => OrdersPage(userId: _userId),
                   ),
-                );
+                ).then((_) {
+                  setState(() {});
+                });
+                ;
               },
             ),
             ListTile(
@@ -131,7 +122,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AddressPage()),
-                );
+                ).then((_) {
+                  setState(() {});
+                });
+                ;
               },
             ),
             ListTile(
@@ -159,7 +153,10 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) => CategoryPage(userId: _userId),
                   ),
-                );
+                ).then((_) {
+                  setState(() {});
+                });
+                ;
               },
             ),
             Divider(),
@@ -170,7 +167,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
-                );
+                ).then((_) {
+                  setState(() {});
+                });
+                ;
               },
             ),
           ],
@@ -206,7 +206,10 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) => CartPage(userId: _userId),
                   ),
-                );
+                ).then((_) {
+                  setState(() {});
+                });
+                ;
               },
               icon: Icon(Icons.shopping_cart, color: Colors.white),
             ),
@@ -214,15 +217,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body:
-          products.isEmpty
-              ? CircularProgressIndicator()
+          widget.products!.isEmpty
+              ? Center(child: CircularProgressIndicator())
               : SizedBox(
                 height: 350,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: products.length,
+                  itemCount: widget.products!.length,
                   itemBuilder: (context, i) {
-                    var item = products[i];
+                    var item = widget.products![i];
                     return SizedBox(
                       width: 200,
                       child: ProductCard(

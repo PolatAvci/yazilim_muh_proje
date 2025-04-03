@@ -13,8 +13,11 @@ class ProductDetailPage extends StatefulWidget {
   final String details;
   final String imagePath;
   final double price;
+  bool _isFav = false;
+  List<Comment> productComments = [];
+  List<dynamic> userFavItem = [];
 
-  const ProductDetailPage({
+  ProductDetailPage({
     super.key,
     required this.id,
     required this.userId,
@@ -29,28 +32,24 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  late bool _isFav = false;
-  late List<Comment> productComments = [];
-  late List<Map<String, dynamic>> userFavItem = [];
-
   _isFavItem() {
-    for (var item in userFavItem) {
+    for (var item in widget.userFavItem) {
       if (item["product"]["id"] == widget.id) {
         setState(() {
-          _isFav = true;
-          return;
+          widget._isFav = true;
         });
+        return;
       }
     }
-    _isFav = false;
+    widget._isFav = false;
   }
 
   Future<void> _getAllUserFavItems() async {
     final response = await http.get(
-      Uri.parse("https://localhost:7212/api/UserFavItem"),
+      Uri.parse("https://localhost:7212/api/UserFavItem/${widget.userId}"),
     );
     if (response.statusCode == 200) {
-      userFavItem = json.decode(response.body);
+      widget.userFavItem = json.decode(response.body);
     }
   }
 
@@ -61,7 +60,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
     if (response.statusCode == 200) {
       for (var item in json.decode(response.body)) {
-        productComments.add(Comment.fromJson(item));
+        widget.productComments.add(Comment.fromJson(item));
       }
     }
   }
@@ -78,7 +77,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Future<void> _addFav() async {
     final response = await http.post(
       Uri.parse("https://localhost:7212/api/UserFavItem"),
-      body: {"userId": widget.userId, "productId": widget.id},
+      headers: {
+        'Content-Type':
+            'application/json', // JSON formatında veri gönderildiğini belirt
+      },
+      body: json.encode({"userId": widget.userId, "productId": widget.id}),
     );
     _getAllUserFavItems();
   }
@@ -87,16 +90,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void initState() {
     super.initState();
 
-    _getAllUserFavItems();
-    _isFavItem();
+    _getAllUserFavItems().then((_) => _isFavItem());
     _getComments();
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     List<int> favItems = [];
-    for (var item in userFavItem) {
+    for (var item in widget.userFavItem) {
       favItems.add(item["product"]["id"]);
     }
     return Scaffold(
@@ -115,13 +116,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               setState(() {
                 if (favItems.contains(widget.id)) {
                   _removeFav();
-                  _isFav = false;
+                  widget._isFav = false;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Ürün favorilerden çıkarıldı")),
                   );
                 } else {
                   _addFav();
-                  _isFav = true;
+                  widget._isFav = true;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Ürün favorilere eklendi")),
                   );
@@ -129,7 +130,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               });
             },
             icon:
-                _isFav
+                widget._isFav
                     ? Icon(Icons.favorite, color: Colors.red)
                     : Icon(Icons.favorite_border, color: Colors.white),
           ),
