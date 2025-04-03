@@ -1,5 +1,3 @@
-
-using System.ComponentModel.DataAnnotations;
 using TrakStoreApi.Models;
 
 namespace TrakStoreApi{

@@ -69,6 +69,7 @@ namespace TrakStoreApi.Controllers
         [HttpPost]
         public async Task<ActionResult<UserProduct>> PostUserProduct(UserProduct userProduct)
         {
+            /*
             // Aynı kullanıcı ve ürün kombinasyonunun daha önce kaydedilip edilmediğini kontrol et
             var existingUserProduct = await _context.UserProducts
                 .FirstOrDefaultAsync(up => up.UserId == userProduct.UserId && up.ProductId == userProduct.ProductId);
@@ -77,7 +78,7 @@ namespace TrakStoreApi.Controllers
             {
                 return BadRequest("Bu ürün zaten kullanıcıyla ilişkilendirilmiş.");
             }
-
+*/
             _context.UserProducts.Add(userProduct);
             await _context.SaveChangesAsync();
 

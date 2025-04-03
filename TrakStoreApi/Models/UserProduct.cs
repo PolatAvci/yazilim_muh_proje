@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -14,5 +15,7 @@ namespace TrakStoreApi.Models
         public Product Product { get; set; }
 
         public string Status { get; set; }
+
+        public DateTime Date { get; set; } = DateTime.Now;
     }
 }

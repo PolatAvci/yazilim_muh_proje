@@ -166,45 +166,40 @@ class _PaymentPageState extends State<PaymentPage> {
 
   // Submit order to the API
   Future<void> _submitOrder() async {
-    final List<Map<String, dynamic>> orderDatas = [];
     for (int i = 0; i < widget.items.length; i++) {
       final orderData = {
         "userId": widget.userId,
         "productId": widget.items[i].id,
         "status": "Kargo Bekliyor",
       };
-      orderDatas.add(orderData);
-    }
-    try {
-      http.Response? response;
-      for (int i = 0; i < widget.items.length; i++) {
-        response = await http.post(
+
+      try {
+        final response = await http.post(
           Uri.parse('https://localhost:7212/api/UserProduct'),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(orderDatas[i]),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(orderData),
         );
-        if (response!.statusCode == 200) {
+
+        if (response.statusCode == 201) {
+          CartItems.items.clear();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Ödeme başarıyla tamamlandı!"),
+              backgroundColor: Colors.green,
+              showCloseIcon: true,
+            ),
+          );
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        } else {
           _showErrorDialog("Sipariş gönderilemedi. Lütfen tekrar deneyin.");
           return;
         }
+      } catch (e) {
+        _showErrorDialog("Bir hata oluştu: $e");
+        return;
       }
-
-      if (response!.statusCode == 200) {
-        // On success, clear cart and show confirmation
-        CartItems.items.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Ödeme başarıyla tamamlandı!"),
-            backgroundColor: Colors.green,
-            showCloseIcon: true,
-          ),
-        );
-        Navigator.pop(context); // Go back to home page
-      } else {
-        _showErrorDialog("Sipariş gönderilemedi. Lütfen tekrar deneyin.");
-      }
-    } catch (e) {
-      _showErrorDialog("Bir hata oluştu: $e");
     }
   }
 
@@ -302,8 +297,141 @@ class _PaymentPageState extends State<PaymentPage> {
             );
           },
           steps: [
-            // Steps definitions go here
-            // ...
+            Step(
+              title: Text('Kişisel Bilgiler', style: GoogleFonts.poppins()),
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: "Ad Soyad",
+                      icon: Icons.person,
+                      controller: nameController,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "E-Posta",
+                      icon: Icons.email,
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "Telefon Numarası",
+                      icon: Icons.phone,
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Step(
+              title: Text('Adres Bilgileri', style: GoogleFonts.poppins()),
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: "İl",
+                      icon: Icons.location_city,
+                      controller: cityController,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "İlçe",
+                      icon: Icons.map,
+                      controller: districtController,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      label: "Adres",
+                      icon: Icons.home,
+                      controller: addressController,
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Step(
+              title: Text('Kart Bilgileri', style: GoogleFonts.poppins()),
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: "Kart Numarası",
+                      icon: Icons.credit_card,
+                      controller: cardController,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTextField(
+                            label: "Son Kullanma",
+                            icon: Icons.calendar_today,
+                            controller: dateController,
+                            keyboardType: TextInputType.datetime,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _buildTextField(
+                            label: "CVV",
+                            icon: Icons.lock,
+                            controller: cvvController,
+                            keyboardType: TextInputType.number,
+                            obscureText: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Step(
+              title: Text('Kargo Firması', style: GoogleFonts.poppins()),
+              stepStyle: StepStyle(color: Colors.transparent),
+              content: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: "Kargo Firması Seçin",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      value: _selectedCargoCompany,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedCargoCompany = newValue;
+                        });
+                      },
+                      items:
+                          cargoCompanies.map((company) {
+                            return DropdownMenuItem<String>(
+                              value: company,
+                              child: Text(company),
+                            );
+                          }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

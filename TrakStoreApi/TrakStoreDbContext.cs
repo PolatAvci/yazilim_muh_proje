@@ -62,7 +62,7 @@ public class TrakStoreDbContext : DbContext
 
         // UserProduct için çoktan çoğa ilişkiyi tanımla
                 modelBuilder.Entity<UserProduct>()
-                        .HasKey(up => new { up.ProductId, up.UserId }); // Composite Key
+                        .HasKey(up => new { up.ProductId, up.UserId, up.Date }); // Composite Key
                         
                 modelBuilder.Entity<UserProduct>()
                 .HasOne(up => up.User)
