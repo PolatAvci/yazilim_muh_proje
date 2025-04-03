@@ -4,6 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
+import 'package:yazilim_muh_proje/Services/comment_service.dart';
+import 'package:yazilim_muh_proje/components/comment_box.dart';
+import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -53,18 +56,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     }
   }
 
-  Future<void> _getComments() async {
-    final response = await http.get(
-      Uri.parse("https://localhost:7212/api/CommentProduct/${widget.id}"),
-    );
-
-    if (response.statusCode == 200) {
-      for (var item in json.decode(response.body)) {
-        widget.productComments.add(Comment.fromJson(item));
-      }
-    }
-  }
-
   Future<void> _removeFav() async {
     final response = await http.delete(
       Uri.parse(
@@ -91,7 +82,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     super.initState();
 
     _getAllUserFavItems().then((_) => _isFavItem());
-    _getComments();
+
+    CommentService.getComments(widget.id).then((value) {
+      setState(() {
+        widget.productComments = value;
+      });
+    });
   }
 
   @override
@@ -244,6 +240,68 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ],
                   ),
                   Divider(),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Yorumlar",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (widget.productComments.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Bu ürüne henüz yorum yapılmamış.",
+                                  ),
+                                  showCloseIcon: true,
+                                ),
+                              );
+                              return;
+                            }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => AllCommentPage(id: widget.id),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            "Tümünü gör",
+                            style: TextStyle(color: Colors.blue.shade400),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  widget.productComments.isEmpty
+                      ? Text("Bu ürüne henüz yorum yapılmamış")
+                      : SizedBox(
+                        height: 140,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount:
+                              widget.productComments.length >= 5
+                                  ? 5
+                                  : widget.productComments.length,
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (context, i) {
+                            return CommentBox(
+                              text: widget.productComments[i].text,
+                              star: widget.productComments[i].star,
+                              date: widget.productComments[i].date,
+                            );
+                          },
+                        ),
+                      ),
                 ],
               ),
             ),

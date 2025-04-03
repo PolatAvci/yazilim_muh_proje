@@ -45,6 +45,25 @@ namespace TrakStoreApi.Controllers
             return Ok(commentProducts);
         }
 
+        // GET: api/CommentProduct/5/3
+        [HttpGet("{commentId}/{productId}")]
+        public async Task<ActionResult<CommentProduct>> GetCommentProduct(int commentId, int productId)
+        {
+            var commentProduct = await _context.CommentProducts
+                .Include(cp => cp.Comment)  // Comment detaylarını da getir
+                .Include(cp => cp.Product)  // Product detaylarını da getir
+                .FirstOrDefaultAsync(cp => cp.CommentId == commentId && cp.ProductId == productId);
+
+            if (commentProduct == null)
+            {
+                return NotFound("Belirtilen yorum ve ürün eşleşmesi bulunamadı.");
+            }
+
+            return Ok(commentProduct);
+        }
+
+
+
         // POST: api/CommentProduct
         [HttpPost]
         public async Task<ActionResult<CommentProduct>> PostCommentProduct(CommentProduct commentProduct)
@@ -53,7 +72,10 @@ namespace TrakStoreApi.Controllers
             await _context.SaveChangesAsync();
 
             // Return the created comment-product relationship
-            return CreatedAtAction("GetCommentProduct", new { id = commentProduct.CommentId }, commentProduct);
+            return CreatedAtAction(nameof(GetCommentProduct), 
+                new { commentId = commentProduct.CommentId, productId = commentProduct.ProductId }, 
+                    commentProduct);
+
         }
 
         // DELETE: api/CommentProduct/5

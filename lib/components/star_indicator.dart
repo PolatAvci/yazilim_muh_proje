@@ -20,6 +20,13 @@ class _StarIndicatorState extends State<StarIndicator> {
     fetchAverageRating();
   }
 
+  @override
+  void didUpdateWidget(covariant StarIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    setState(() {});
+  }
+
   Future<void> fetchAverageRating() async {
     try {
       final response = await http.get(
@@ -32,7 +39,7 @@ class _StarIndicatorState extends State<StarIndicator> {
         List<dynamic> comments = jsonDecode(response.body);
         if (comments.isNotEmpty) {
           double sum = comments
-              .map((comment) => comment['star'] as int)
+              .map((comment) => comment["comment"]['star'] as int)
               .fold(0, (prev, star) => prev + star);
           double average = sum / comments.length;
 

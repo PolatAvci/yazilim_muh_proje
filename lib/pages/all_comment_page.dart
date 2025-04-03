@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:yazilim_muh_proje/Models/comment.dart';
+import 'package:yazilim_muh_proje/Services/comment_service.dart';
 import 'package:yazilim_muh_proje/components/star_indicator.dart';
 
 class AllCommentPage extends StatefulWidget {
@@ -13,29 +13,16 @@ class AllCommentPage extends StatefulWidget {
 }
 
 class _AllCommentPageState extends State<AllCommentPage> {
-  List<Map<String, dynamic>> _comments = [];
+  List<Comment> _comments = [];
 
   @override
   void initState() {
     super.initState();
-    fetchComments();
-  }
-
-  Future<void> fetchComments() async {
-    try {
-      final response = await http.get(
-        Uri.parse('https://localhost:7212/api/CommentProduct/${widget.id}'),
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(response.body);
-        setState(() {
-          _comments = List<Map<String, dynamic>>.from(data);
-        });
-      }
-    } catch (e) {
-      print("Hata: $e");
-    }
+    CommentService.getComments(widget.id).then((value) {
+      setState(() {
+        _comments = value;
+      });
+    });
   }
 
   // Yıldızları göstermek için widget
@@ -109,7 +96,7 @@ class _AllCommentPageState extends State<AllCommentPage> {
                             size: 30,
                           ),
                           title: Text(
-                            comment['text'] ?? "",
+                            comment.text,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -118,10 +105,10 @@ class _AllCommentPageState extends State<AllCommentPage> {
                           ),
                           subtitle: Row(
                             children: [
-                              buildStarRating(comment['star'] ?? 0),
+                              buildStarRating(comment.star),
                               SizedBox(width: 4),
                               Text(
-                                "${comment['star'] ?? 0}",
+                                "${comment.star}",
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 14,

@@ -133,6 +133,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         CommentService.addComment(
                           star,
                           commentController.text,
+                          widget.order.id,
                         ).then((response) {
                           if (response.statusCode == 201) {
                             ScaffoldMessenger.of(context).showSnackBar(
