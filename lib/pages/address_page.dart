@@ -19,20 +19,32 @@ class _AddressPageState extends State<AddressPage> {
 
   void _saveAddress() {
     if (_addressController.text.isNotEmpty && _cityController.text.isNotEmpty) {
-      final newAddress = Address(
-        id: 1, //DateTime.now().millisecondsSinceEpoch.toString(),
-        address: _addressController.text,
-        sehir: _cityController.text,
-      );
-
-      widget.adresler.add(newAddress);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Adresiniz kaydedildi"),
-          showCloseIcon: true,
-        ),
-      );
+      AddressService.addAddress(
+        widget.userId,
+        _addressController.text,
+        _cityController.text,
+      ).then((response) {
+        if (response.statusCode == 201) {
+          AddressService.getAddresses(widget.userId).then((value) {
+            setState(() {
+              widget.adresler = value;
+            });
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Adresiniz kaydedildi"),
+              showCloseIcon: true,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Hata: Adres Kaydedilemedi"),
+              showCloseIcon: true,
+            ),
+          );
+        }
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -44,13 +56,27 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   void _deleteAddress(Address address) {
-    setState(() {
-      widget.adresler.removeWhere((a) => a.id == address.id);
+    AddressService.removeAddress(widget.userId, address.id).then((response) {
+      if (response.statusCode == 204) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Adres silindi'), showCloseIcon: true),
+        );
+        setState(() {
+          AddressService.getAddresses(widget.userId).then((value) {
+            setState(() {
+              widget.adresler = value;
+            });
+          });
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Hata: Adres silinemedi'),
+            showCloseIcon: true,
+          ),
+        );
+      }
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Adres silindi'), showCloseIcon: true),
-    );
   }
 
   @override
