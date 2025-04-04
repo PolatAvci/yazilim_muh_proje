@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/Services/Product_service.dart';
 import 'package:yazilim_muh_proje/Services/user_service.dart';
+import 'package:yazilim_muh_proje/pages/login_page.dart';
 
 class ProductCard extends StatefulWidget {
   final Widget image;
@@ -88,6 +89,12 @@ class _ProductCardState extends State<ProductCard> {
                             SnackBar(
                               content: Text("Lütfen giriş yapınız!"),
                               showCloseIcon: true,
+                            ),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginPage(),
                             ),
                           );
                           return;

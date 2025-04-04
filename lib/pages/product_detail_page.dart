@@ -9,6 +9,7 @@ import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/comment_box.dart';
 import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
+import 'package:yazilim_muh_proje/pages/login_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int id;
@@ -120,6 +121,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     showCloseIcon: true,
                   ),
                 );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
                 return;
               }
               setState(() {
@@ -157,6 +162,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     content: Text("Lütfen giriş yapın"),
                     showCloseIcon: true,
                   ),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
                 return;
               }
@@ -228,6 +237,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 showCloseIcon: true,
                               ),
                             );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ),
+                            );
                             return;
                           }
                           if (CartItems.items.any(
@@ -273,6 +288,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               SnackBar(
                                 content: Text("Lütfen giriş yapın"),
                                 showCloseIcon: true,
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
                               ),
                             );
                             return;

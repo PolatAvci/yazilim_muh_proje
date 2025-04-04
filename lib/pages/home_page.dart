@@ -237,6 +237,10 @@ class _HomePageState extends State<HomePage> {
                       showCloseIcon: true,
                     ),
                   );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
                 }
               },
               icon: Icon(Icons.shopping_cart, color: Colors.white),
