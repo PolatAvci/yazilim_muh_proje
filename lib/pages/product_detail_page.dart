@@ -5,13 +5,13 @@ import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
 import 'package:yazilim_muh_proje/Services/comment_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/comment_box.dart';
 import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int id;
-  final int userId;
   final String name;
   final String details;
   final String imagePath;
@@ -23,7 +23,6 @@ class ProductDetailPage extends StatefulWidget {
   ProductDetailPage({
     super.key,
     required this.id,
-    required this.userId,
     required this.name,
     required this.details,
     required this.imagePath,
@@ -49,7 +48,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   Future<void> _getAllUserFavItems() async {
     final response = await http.get(
-      Uri.parse("https://localhost:7212/api/UserFavItem/${widget.userId}"),
+      Uri.parse(
+        "https://localhost:7212/api/UserFavItem/${UserService.user!.id}",
+      ),
     );
     if (response.statusCode == 200) {
       widget.userFavItem = json.decode(response.body);
@@ -59,7 +60,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Future<void> _removeFav() async {
     final response = await http.delete(
       Uri.parse(
-        "https://localhost:7212/api/UserFavItem/${widget.userId}/${widget.id}",
+        "https://localhost:7212/api/UserFavItem/${UserService.user!.id}/${widget.id}",
       ),
     );
     _getAllUserFavItems();
@@ -72,7 +73,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         'Content-Type':
             'application/json', // JSON formatında veri gönderildiğini belirt
       },
-      body: json.encode({"userId": widget.userId, "productId": widget.id}),
+      body: json.encode({
+        "userId": UserService.user!.id,
+        "productId": widget.id,
+      }),
     );
     _getAllUserFavItems();
   }
@@ -80,9 +84,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
-
-    _getAllUserFavItems().then((_) => _isFavItem());
-
+    if (UserService.user?.id != null) {
+      _getAllUserFavItems().then((_) => _isFavItem());
+    }
     CommentService.getComments(widget.id).then((value) {
       setState(() {
         widget.productComments = value;
@@ -114,13 +118,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   _removeFav();
                   widget._isFav = false;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Ürün favorilerden çıkarıldı")),
+                    SnackBar(
+                      content: Text("Ürün favorilerden çıkarıldı"),
+                      showCloseIcon: true,
+                    ),
                   );
                 } else {
                   _addFav();
                   widget._isFav = true;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Ürün favorilere eklendi")),
+                    SnackBar(
+                      content: Text("Ürün favorilere eklendi"),
+                      showCloseIcon: true,
+                    ),
                   );
                 }
               });
@@ -134,9 +144,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => CartPage(userId: widget.userId),
-                ),
+                MaterialPageRoute(builder: (context) => CartPage()),
               );
             },
             icon: Icon(Icons.shopping_cart, color: Colors.white),

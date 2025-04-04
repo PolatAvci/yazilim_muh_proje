@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'dart:convert';
 import 'package:yazilim_muh_proje/pages/category_products_page.dart';
 
 class CategoryPage extends StatefulWidget {
-  final int userId;
   bool isLoading = true;
-  CategoryPage({super.key, required this.userId});
+  CategoryPage({super.key});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -74,7 +74,7 @@ class _CategoryPageState extends State<CategoryPage> {
                         MaterialPageRoute(
                           builder:
                               (context) => CategoryProductsPage(
-                                userId: widget.userId,
+                                userId: UserService.user!.id,
                                 category: category['id'],
                               ),
                         ),

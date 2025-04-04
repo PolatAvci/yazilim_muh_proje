@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/Services/Product_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 
 class ProductCard extends StatefulWidget {
   final Widget image;
@@ -10,7 +11,6 @@ class ProductCard extends StatefulWidget {
   final String category;
   final String details;
   final String imagePath;
-  final int userId;
   bool isFav = false;
 
   ProductCard({
@@ -23,7 +23,6 @@ class ProductCard extends StatefulWidget {
     required this.price,
     required this.onpressed,
     required this.imagePath,
-    required this.userId,
   });
 
   @override
@@ -34,22 +33,25 @@ class _ProductCardState extends State<ProductCard> {
   @override
   void initState() {
     super.initState();
-    ProductService.getIsFav(widget.userId, widget.id).then((value) {
-      setState(() {
-        widget.isFav = value;
+    if (UserService.user?.id != null) {
+      ProductService.getIsFav(UserService.user!.id, widget.id).then((value) {
+        setState(() {
+          widget.isFav = value;
+        });
       });
-    });
+    }
   }
 
   @override
   void didUpdateWidget(covariant ProductCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    ProductService.getIsFav(widget.userId, widget.id).then((value) {
-      setState(() {
-        widget.isFav = value;
+    if (UserService.user?.id != null) {
+      ProductService.getIsFav(UserService.user.id, widget.id).then((value) {
+        setState(() {
+          widget.isFav = value;
+        });
       });
-    });
+    }
   }
 
   @override
@@ -81,6 +83,15 @@ class _ProductCardState extends State<ProductCard> {
                     ),
                     IconButton(
                       onPressed: () async {
+                        if (UserService.user?.id == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Lütfen giriş yapınız!"),
+                              showCloseIcon: true,
+                            ),
+                          );
+                          return;
+                        }
                         setState(() {
                           widget.isFav = !widget.isFav;
                         });
@@ -88,7 +99,7 @@ class _ProductCardState extends State<ProductCard> {
                         if (widget.isFav) {
                           // Favoriye ekle
                           final response = await ProductService.addFav(
-                            widget.userId,
+                            UserService.user.id,
                             widget.id,
                           );
 
@@ -112,7 +123,7 @@ class _ProductCardState extends State<ProductCard> {
                         } else {
                           // Favorilerden çıkar
                           final response = await ProductService.removeFav(
-                            widget.userId,
+                            UserService.user.id,
                             widget.id,
                           );
 

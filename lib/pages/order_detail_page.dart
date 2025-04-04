@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:yazilim_muh_proje/Models/order.dart';
 import 'package:yazilim_muh_proje/Services/comment_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 
 class OrderDetailPage extends StatefulWidget {
@@ -44,7 +44,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           children: [
             _buildCard(
               'Müşteri Adı:',
-              "Sabit ad",
+              "${UserService.user!.name} ${UserService.user!.surname}",
               Colors.black,
               FontWeight.bold,
             ),

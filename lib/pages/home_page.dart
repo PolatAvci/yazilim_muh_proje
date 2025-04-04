@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/Services/Product_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/product_card.dart';
 import 'package:yazilim_muh_proje/pages/address_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
@@ -18,8 +19,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final int _userId = 1; //login yapılmış gibi göstermek için
-
   @override
   void initState() {
     // TODO: implement initState
@@ -72,21 +71,16 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
-                        ).then((_) {
-                          setState(() {});
-                        });
-                      },
-                      child: Text(
-                        "Kayıt ol / Giriş yap",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
+                    SizedBox(height: 30),
+                    UserService.user?.id == null
+                        ? SizedBox()
+                        : Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Text(
+                            "${UserService.user!.name} ${UserService.user!.surname}",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
                   ],
                 ),
               ),
@@ -98,83 +92,109 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
-              leading: Icon(Icons.shopping_bag, color: Colors.blue.shade400),
-              title: Text('Siparişlerim'),
-              onTap: () {
-                Navigator.pop(context); // Drawer kapatmak için
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OrdersPage(userId: _userId),
+            UserService.user?.id != null
+                ? SizedBox()
+                : ListTile(
+                  leading: Icon(Icons.login, color: Colors.blue.shade400),
+                  title: Text("Giriş Yap"),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    ).then((_) {
+                      setState(() {});
+                    });
+                  },
+                ),
+            UserService.user?.id == null
+                ? SizedBox()
+                : ListTile(
+                  leading: Icon(
+                    Icons.shopping_bag,
+                    color: Colors.blue.shade400,
                   ),
-                ).then((_) {
-                  setState(() {});
-                });
-                ;
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.location_on, color: Colors.blue.shade400),
-              title: Text('Adreslerim'),
-              onTap: () {
-                Navigator.pop(context); // Drawer kapatmak için
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddressPage(userId: _userId),
-                  ),
-                ).then((_) {
-                  setState(() {});
-                });
-                ;
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.favorite, color: Colors.blue.shade400),
-              title: Text('Favorilerim'),
-              onTap: () {
-                Navigator.pop(context); // Drawer kapatmak için
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FavoritePage(userId: _userId),
-                  ),
-                ).then((value) {
-                  setState(() {});
-                });
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.category, color: Colors.blue.shade400),
-              title: Text('Kategoriler'),
-              onTap: () {
-                Navigator.pop(context); // Drawer kapatmak için
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CategoryPage(userId: _userId),
-                  ),
-                ).then((_) {
-                  setState(() {});
-                });
-                ;
-              },
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.exit_to_app, color: Colors.blue.shade400),
-              title: Text("Oturumu kapat"),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                ).then((_) {
-                  setState(() {});
-                });
-                ;
-              },
-            ),
+                  title: Text('Siparişlerim'),
+                  onTap: () {
+                    Navigator.pop(context); // Drawer kapatmak için
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => OrdersPage()),
+                    ).then((_) {
+                      setState(() {});
+                    });
+                    ;
+                  },
+                ),
+            UserService.user?.id == null
+                ? SizedBox()
+                : ListTile(
+                  leading: Icon(Icons.location_on, color: Colors.blue.shade400),
+                  title: Text('Adreslerim'),
+                  onTap: () {
+                    Navigator.pop(context); // Drawer kapatmak için
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddressPage()),
+                    ).then((_) {
+                      setState(() {});
+                    });
+                    ;
+                  },
+                ),
+            UserService.user?.id == null
+                ? SizedBox()
+                : ListTile(
+                  leading: Icon(Icons.favorite, color: Colors.blue.shade400),
+                  title: Text('Favorilerim'),
+                  onTap: () {
+                    Navigator.pop(context); // Drawer kapatmak için
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                FavoritePage(userId: UserService.user!.id),
+                      ),
+                    ).then((value) {
+                      setState(() {});
+                    });
+                  },
+                ),
+            UserService.user?.id == null
+                ? SizedBox()
+                : ListTile(
+                  leading: Icon(Icons.category, color: Colors.blue.shade400),
+                  title: Text('Kategoriler'),
+                  onTap: () {
+                    Navigator.pop(context); // Drawer kapatmak için
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CategoryPage()),
+                    ).then((_) {
+                      setState(() {});
+                    });
+                    ;
+                  },
+                ),
+            UserService.user?.id == null ? SizedBox() : Divider(),
+            UserService.user?.id == null
+                ? SizedBox()
+                : ListTile(
+                  leading: Icon(Icons.exit_to_app, color: Colors.blue.shade400),
+                  title: Text("Oturumu kapat"),
+                  onTap: () {
+                    setState(() {
+                      UserService.logout();
+                    });
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Başarıyla çıkış yapıldı"),
+                        showCloseIcon: true,
+                      ),
+                    );
+                  },
+                ),
           ],
         ),
       ),
@@ -203,15 +223,21 @@ class _HomePageState extends State<HomePage> {
             ),
             IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CartPage(userId: _userId),
-                  ),
-                ).then((_) {
-                  setState(() {});
-                });
-                ;
+                if (UserService.user?.id != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CartPage()),
+                  ).then((_) {
+                    setState(() {});
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Lütfen giriş yapın!"),
+                      showCloseIcon: true,
+                    ),
+                  );
+                }
               },
               icon: Icon(Icons.shopping_cart, color: Colors.white),
             ),
@@ -232,7 +258,6 @@ class _HomePageState extends State<HomePage> {
                       width: 200,
                       child: ProductCard(
                         id: item["id"],
-                        userId: _userId,
                         category: "Sonra kaldırılacak",
                         details: item["details"],
                         imagePath: item["image"],
@@ -252,7 +277,6 @@ class _HomePageState extends State<HomePage> {
                               builder:
                                   (context) => ProductDetailPage(
                                     id: item["id"],
-                                    userId: _userId,
                                     name: item["name"],
                                     details: item["details"],
                                     imagePath: item["image"],

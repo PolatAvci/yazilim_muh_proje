@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:yazilim_muh_proje/Models/order.dart';
 import 'package:yazilim_muh_proje/Services/order_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/pages/order_detail_page.dart';
 
 class OrdersPage extends StatefulWidget {
-  final int userId;
   List<Order>? _orders = [];
   bool _isLoading = true;
-  OrdersPage({super.key, required this.userId});
+  OrdersPage({super.key});
 
   @override
   State<OrdersPage> createState() => _OrdersPageState();
@@ -16,7 +16,9 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage> {
   Future<void> _fetchOrders() async {
     try {
-      List<Order>? orders = await OrderService.fetchOrders(widget.userId);
+      List<Order>? orders = await OrderService.fetchOrders(
+        UserService.user!.id,
+      );
       setState(() {
         widget._orders = orders ?? [];
         widget._isLoading = false;
@@ -118,7 +120,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                     ),
                                   ),
                                   Text(
-                                    "Sabit Ad",
+                                    "${UserService.user!.name} ${UserService.user!.surname}",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.normal,

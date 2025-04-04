@@ -6,15 +6,15 @@ import 'package:yazilim_muh_proje/Models/product.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:yazilim_muh_proje/Services/user_service.dart';
+
 class PaymentPage extends StatefulWidget {
-  final int userId;
   final List<Product> items;
   final double shippingCost;
   const PaymentPage({
     super.key,
     required this.items,
     required this.shippingCost,
-    required this.userId,
   });
 
   @override
@@ -168,7 +168,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Future<void> _submitOrder() async {
     for (int i = 0; i < widget.items.length; i++) {
       final orderData = {
-        "userId": widget.userId,
+        "userId": UserService.user!.id,
         "productId": widget.items[i].id,
         "status": "Kargo Bekliyor",
       };

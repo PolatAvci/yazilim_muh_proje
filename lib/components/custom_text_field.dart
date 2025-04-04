@@ -6,14 +6,14 @@ class CustomTextField extends StatefulWidget {
     required this.label,
     this.password = false,
     this.keyboardType,
-    required this.onChanged,
+    this.onChanged,
     required TextEditingController controller,
     required String hint,
   });
 
   final String label;
   final bool password;
-  final Function(String) onChanged;
+  final Function(String)? onChanged;
   final TextInputType? keyboardType;
 
   @override

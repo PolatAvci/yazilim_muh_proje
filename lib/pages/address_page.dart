@@ -1,13 +1,13 @@
 import "package:flutter/material.dart";
 import 'package:yazilim_muh_proje/Models/address.dart';
 import 'package:yazilim_muh_proje/Services/address_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 
 class AddressPage extends StatefulWidget {
-  final int userId;
   List<Address> adresler = [];
-  AddressPage({super.key, required this.userId});
+  AddressPage({super.key});
 
   @override
   State<AddressPage> createState() => _AddressPageState();
@@ -20,12 +20,12 @@ class _AddressPageState extends State<AddressPage> {
   void _saveAddress() {
     if (_addressController.text.isNotEmpty && _cityController.text.isNotEmpty) {
       AddressService.addAddress(
-        widget.userId,
+        UserService.user!.id,
         _addressController.text,
         _cityController.text,
       ).then((response) {
         if (response.statusCode == 201) {
-          AddressService.getAddresses(widget.userId).then((value) {
+          AddressService.getAddresses(UserService.user!.id).then((value) {
             setState(() {
               widget.adresler = value;
             });
@@ -56,13 +56,15 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   void _deleteAddress(Address address) {
-    AddressService.removeAddress(widget.userId, address.id).then((response) {
+    AddressService.removeAddress(UserService.user!.id, address.id).then((
+      response,
+    ) {
       if (response.statusCode == 204) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Adres silindi'), showCloseIcon: true),
         );
         setState(() {
-          AddressService.getAddresses(widget.userId).then((value) {
+          AddressService.getAddresses(UserService.user!.id).then((value) {
             setState(() {
               widget.adresler = value;
             });
@@ -83,7 +85,7 @@ class _AddressPageState extends State<AddressPage> {
   void initState() {
     super.initState();
 
-    AddressService.getAddresses(widget.userId).then((value) {
+    AddressService.getAddresses(UserService.user!.id).then((value) {
       setState(() {
         widget.adresler = value;
       });

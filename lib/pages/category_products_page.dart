@@ -112,7 +112,6 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                               builder:
                                   (context) => ProductDetailPage(
                                     id: product['id'],
-                                    userId: widget.userId,
                                     name: product['name'],
                                     details: product['details'],
                                     imagePath: product['image'],

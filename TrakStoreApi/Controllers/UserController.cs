@@ -49,6 +49,24 @@ namespace TrakStoreApi.Controllers
             return Ok(user);
         }
 
+        // POST: api/User/login
+        [HttpPost("Login")]
+        public async Task<ActionResult<User>> Login(LoginRequest loginRequest)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == loginRequest.Email && u.Password == loginRequest.Password);
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Email veya şifre hatalı." });
+            }
+
+            // Token üretimi yapılacaksa burada eklenebilir
+
+            return Ok(user);
+        }
+
+
         // POST: api/User
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)

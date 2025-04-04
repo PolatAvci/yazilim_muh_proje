@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
+import 'package:yazilim_muh_proje/pages/home_page.dart';
 import 'package:yazilim_muh_proje/pages/register_page.dart';
-import 'package:yazilim_muh_proje/pages/kullanim_kosullari_page.dart';
-import 'package:yazilim_muh_proje/Models/user.dart';
 
 class LoginWithEmailPage extends StatefulWidget {
   const LoginWithEmailPage({super.key});
@@ -12,25 +12,16 @@ class LoginWithEmailPage extends StatefulWidget {
 }
 
 class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
-  String _inputText = "";
-  String _passwordText = "";
-  final _email = TextEditingController();
-  final _password = TextEditingController();
+  final _emailComtroller = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {
     super.dispose();
-    _email.dispose();
-    _password.dispose();
+    _emailComtroller.dispose();
+    _passwordController.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-}
-/*
   Widget _buildErrorText(bool isValid) {
     return isValid
         ? Row(
@@ -80,40 +71,43 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
   }
 
   void _login() {
-    bool isEmailValid = _isValidEmail(_inputText);
-    bool isPasswordValid = _passwordText.isNotEmpty;
+    bool isEmailValid = _isValidEmail(_emailComtroller.text);
+    bool isPasswordValid = _passwordController.text.isNotEmpty;
 
     if (isEmailValid && isPasswordValid) {
-      User user = Veriler.kullanicilar.firstWhere(
-        (user) => user.email == _inputText && user.password == _passwordText,
-        orElse:
-            () => User(
-              email: "",
-              password: "",
-            ), // Varsayılan bir User döndürüyoruz
+      UserService.login(_emailComtroller.text, _passwordController.text).then((
+        user,
+      ) {
+        if (user != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          // Kullanıcı bulunamadı, hata mesajı göster
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Geçersiz e-posta veya şifre"),
+              showCloseIcon: true,
+            ),
+          );
+        }
+      });
+    } else {
+      // Kullanıcı bulunamadı, hata mesajı göster
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Geçersiz e-posta veya şifre"),
+          showCloseIcon: true,
+        ),
       );
-
-      if (user.email.isNotEmpty) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => KullanimKosullariPage()),
-        );
-      } else {
-        // Kullanıcı bulunamadı, hata mesajı göster
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Geçersiz e-posta veya şifre"),
-            showCloseIcon: true,
-          ),
-        );
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isEmailValid = _isValidEmail(_inputText);
-    bool isPasswordValid = _passwordText.isNotEmpty;
+    bool isEmailValid = _isValidEmail(_emailComtroller.text);
+    bool isPasswordValid = _passwordController.text.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -166,22 +160,22 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
             CustomTextField(
               hint: "Email girin:",
               label: "E-posta",
-              controller: _email,
+              controller: _emailComtroller,
               keyboardType: TextInputType.emailAddress,
-              onChanged: (text) {
+              onChanged: (value) {
                 setState(() {
-                  _inputText = text;
+                  _emailComtroller.text = value;
                 });
               },
             ),
             CustomTextField(
               hint: "Şifre girin:",
               label: "Şifre",
-              controller: _password,
+              controller: _passwordController,
               password: true,
-              onChanged: (text) {
+              onChanged: (value) {
                 setState(() {
-                  _passwordText = text;
+                  _passwordController.text = value;
                 });
               },
             ),
@@ -222,4 +216,3 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 }
-*/
