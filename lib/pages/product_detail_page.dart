@@ -113,6 +113,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         actions: [
           IconButton(
             onPressed: () {
+              if (UserService.user?.id == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Lütfen giriş yapın"),
+                    showCloseIcon: true,
+                  ),
+                );
+                return;
+              }
               setState(() {
                 if (favItems.contains(widget.id)) {
                   _removeFav();
@@ -142,6 +151,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
           IconButton(
             onPressed: () {
+              if (UserService.user?.id == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Lütfen giriş yapın"),
+                    showCloseIcon: true,
+                  ),
+                );
+                return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => CartPage()),
@@ -203,12 +221,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
+                          if (UserService.user?.id == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Lütfen giriş yapın"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                            return;
+                          }
                           if (CartItems.items.any(
                             (product) => product.id == widget.id,
                           )) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Ürün sepetinizde zaten var"),
+                                showCloseIcon: true,
                               ),
                             );
                             return;
@@ -224,7 +252,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             ),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Ürün sepete eklendi")),
+                            SnackBar(
+                              content: Text("Ürün sepete eklendi"),
+                              showCloseIcon: true,
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -236,7 +267,48 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          if (UserService.user?.id == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Lütfen giriş yapın"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                            return;
+                          }
+                          if (CartItems.items.any(
+                            (product) => product.id == widget.id,
+                          )) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün sepetinizde zaten var"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                            return;
+                          }
+                          CartItems.items.add(
+                            Product(
+                              id: widget.id,
+                              details: widget.details,
+                              name: widget.name,
+                              price: widget.price,
+                              image: widget.imagePath,
+                              productCategories: [], //ŞİMDİLİK BOŞ
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Ürün sepete eklendi"),
+                              showCloseIcon: true,
+                            ),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CartPage()),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade700,
                         ),

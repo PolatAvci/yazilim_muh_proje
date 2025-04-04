@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:yazilim_muh_proje/Models/comment.dart';
+import 'package:yazilim_muh_proje/Services/comment_service.dart';
 
 class StarIndicator extends StatefulWidget {
   final int productId;
@@ -28,28 +28,19 @@ class _StarIndicatorState extends State<StarIndicator> {
   }
 
   Future<void> fetchAverageRating() async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-          'https://localhost:7212/api/CommentProduct/${widget.productId}',
-        ),
-      );
+    final List<Comment> comments = await CommentService.getComments(
+      widget.productId,
+    );
 
-      if (response.statusCode == 200) {
-        List<dynamic> comments = jsonDecode(response.body);
-        if (comments.isNotEmpty) {
-          double sum = comments
-              .map((comment) => comment["comment"]['star'] as int)
-              .fold(0, (prev, star) => prev + star);
-          double average = sum / comments.length;
+    if (comments.isNotEmpty) {
+      double sum = comments
+          .map((comment) => comment.star)
+          .fold(0, (prev, star) => prev + star);
+      double average = sum / comments.length;
 
-          setState(() {
-            _averageRating = average;
-          });
-        }
-      }
-    } catch (e) {
-      print("Hata: $e");
+      setState(() {
+        _averageRating = average;
+      });
     }
   }
 

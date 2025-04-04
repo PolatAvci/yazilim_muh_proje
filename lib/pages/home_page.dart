@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
                 ? SizedBox()
                 : ListTile(
                   leading: Icon(Icons.login, color: Colors.blue.shade400),
-                  title: Text("Giriş Yap"),
+                  title: Text("Giriş Yap / Kayıt ol"),
                   onTap: () {
                     Navigator.push(
                       context,

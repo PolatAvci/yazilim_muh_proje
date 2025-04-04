@@ -132,7 +132,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       onPressed: () async {
                         CommentService.addComment(
                           star,
-                          commentController.text,
+                          commentController.text.trim(),
                           widget.order.id,
                         ).then((response) {
                           if (response.statusCode == 201) {

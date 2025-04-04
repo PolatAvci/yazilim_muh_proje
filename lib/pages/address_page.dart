@@ -18,11 +18,12 @@ class _AddressPageState extends State<AddressPage> {
   final _addressController = TextEditingController();
 
   void _saveAddress() {
-    if (_addressController.text.isNotEmpty && _cityController.text.isNotEmpty) {
+    if (_addressController.text.trim().isNotEmpty &&
+        _cityController.text.trim().isNotEmpty) {
       AddressService.addAddress(
         UserService.user!.id,
-        _addressController.text,
-        _cityController.text,
+        _addressController.text.trim(),
+        _cityController.text.trim(),
       ).then((response) {
         if (response.statusCode == 201) {
           AddressService.getAddresses(UserService.user!.id).then((value) {

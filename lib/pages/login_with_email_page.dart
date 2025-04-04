@@ -71,13 +71,14 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
   }
 
   void _login() {
-    bool isEmailValid = _isValidEmail(_emailComtroller.text);
-    bool isPasswordValid = _passwordController.text.isNotEmpty;
+    bool isEmailValid = _isValidEmail(_emailComtroller.text.trim());
+    bool isPasswordValid = _passwordController.text.trim().isNotEmpty;
 
     if (isEmailValid && isPasswordValid) {
-      UserService.login(_emailComtroller.text, _passwordController.text).then((
-        user,
-      ) {
+      UserService.login(
+        _emailComtroller.text.trim(),
+        _passwordController.text.trim(),
+      ).then((user) {
         if (user != null) {
           Navigator.push(
             context,
