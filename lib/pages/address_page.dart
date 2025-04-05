@@ -1,5 +1,7 @@
 import "package:flutter/material.dart";
 import 'package:yazilim_muh_proje/Models/address.dart';
+import 'package:yazilim_muh_proje/Services/address_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 
@@ -11,30 +13,40 @@ class AddressPage extends StatefulWidget {
 }
 
 class _AddressPageState extends State<AddressPage> {
-  List<Address> adresler = [
-    Address(id: "1", address: "İstiklal Caddesi No:5", sehir: "İstanbul"),
-    Address(id: "2", address: "Atatürk Bulvarı No:12", sehir: "Ankara"),
-    Address(id: "3", address: "Konak Mah. 123. Sokak", sehir: "İzmir"),
-  ];
+  List<Address> adresler = [];
   final _cityController = TextEditingController();
   final _addressController = TextEditingController();
 
   void _saveAddress() {
-    if (_addressController.text.isNotEmpty && _cityController.text.isNotEmpty) {
-      final newAddress = Address(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        address: _addressController.text,
-        sehir: _cityController.text,
-      );
-
-      adresler.add(newAddress);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Adresiniz kaydedildi"),
-          showCloseIcon: true,
-        ),
-      );
+    if (_addressController.text.trim().isNotEmpty &&
+        _cityController.text.trim().isNotEmpty) {
+      AddressService.addAddress(
+        UserService.user!.id,
+        _addressController.text.trim(),
+        _cityController.text.trim(),
+      ).then((response) {
+        if (!mounted) return;
+        if (response.statusCode == 201) {
+          AddressService.getAddresses(UserService.user!.id).then((value) {
+            setState(() {
+              adresler = value;
+            });
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Adresiniz kaydedildi"),
+              showCloseIcon: true,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Hata: Adres Kaydedilemedi"),
+              showCloseIcon: true,
+            ),
+          );
+        }
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -46,13 +58,42 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   void _deleteAddress(Address address) {
-    setState(() {
-      adresler.removeWhere((a) => a.id == address.id);
+    AddressService.removeAddress(UserService.user!.id, address.id).then((
+      response,
+    ) {
+      if (response.statusCode == 204) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Adres silindi'), showCloseIcon: true),
+        );
+        setState(() {
+          AddressService.getAddresses(UserService.user!.id).then((value) {
+            setState(() {
+              adresler = value;
+            });
+          });
+        });
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Hata: Adres silinemedi'),
+            showCloseIcon: true,
+          ),
+        );
+      }
     });
+  }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Adres silindi'), showCloseIcon: true),
-    );
+  @override
+  void initState() {
+    super.initState();
+
+    AddressService.getAddresses(UserService.user!.id).then((value) {
+      setState(() {
+        adresler = value;
+      });
+    });
   }
 
   @override

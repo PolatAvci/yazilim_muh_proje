@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:yazilim_muh_proje/Models/cart_items.dart';
-import 'package:yazilim_muh_proje/Models/order.dart';
-import 'package:yazilim_muh_proje/Models/orders_items.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<Product> items;
@@ -151,32 +153,8 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
             TextButton(
               onPressed: () {
-                for (Product product in CartItems.items) {
-                  OrdersItems.items.add(
-                    Order(
-                      customerName: nameController.text,
-                      status: "Hazırlanıyor",
-                      id: product.id,
-                      category: product.category,
-                      details: product.details,
-                      name: product.name,
-                      price: product.price,
-                      image: product.image,
-                    ),
-                  );
-                }
-                CartItems.items.clear();
-                // Show success snackbar after confirmation
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Ödeme başarıyla tamamlandı!"),
-                    backgroundColor: Colors.green,
-                    showCloseIcon: true,
-                  ),
-                );
-                Navigator.pop(context); // Diyalogu kapatmak için
-                Navigator.pop(context); // Sepete dönmek için
-                Navigator.pop(context); // Ana sayfaya dönmek için
+                // Send order data to the API
+                _submitOrder();
               },
               child: Text('Onayla', style: GoogleFonts.poppins()),
             ),
@@ -184,6 +162,45 @@ class _PaymentPageState extends State<PaymentPage> {
         );
       },
     );
+  }
+
+  // Submit order to the API
+  Future<void> _submitOrder() async {
+    for (int i = 0; i < widget.items.length; i++) {
+      final orderData = {
+        "userId": UserService.user!.id,
+        "productId": widget.items[i].id,
+        "status": "Kargo Bekliyor",
+      };
+
+      try {
+        final response = await http.post(
+          Uri.parse('https://localhost:7212/api/UserProduct'),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(orderData),
+        );
+
+        if (response.statusCode == 201) {
+          CartItems.items.clear();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Ödeme başarıyla tamamlandı!"),
+              backgroundColor: Colors.green,
+              showCloseIcon: true,
+            ),
+          );
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        } else {
+          _showErrorDialog("Sipariş gönderilemedi. Lütfen tekrar deneyin.");
+          return;
+        }
+      } catch (e) {
+        _showErrorDialog("Bir hata oluştu: $e");
+        return;
+      }
+    }
   }
 
   @override
@@ -225,12 +242,6 @@ class _PaymentPageState extends State<PaymentPage> {
                 });
               } else {
                 // Show confirmation dialog after final step
-                for (int i = 0; i < 4; i++) {
-                  // Tüm adımları kontrol et boş alan varsa fonksiyon durur
-                  if (!_validateStep(i)) {
-                    return;
-                  }
-                }
                 _showConfirmationDialog();
               }
             }
@@ -271,12 +282,12 @@ class _PaymentPageState extends State<PaymentPage> {
                 TextButton(
                   onPressed: details.onStepCancel,
                   style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(
+                    shape: WidgetStateProperty.all(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                     ),
-                    foregroundColor: WidgetStatePropertyAll(
+                    foregroundColor: WidgetStateProperty.all(
                       Colors.blue.shade400,
                     ),
                   ),

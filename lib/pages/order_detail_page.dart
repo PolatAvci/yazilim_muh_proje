@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/comment.dart';
-import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/order.dart';
+import 'package:yazilim_muh_proje/Services/comment_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final Order order;
 
-  OrderDetailPage({super.key, required this.order});
+  const OrderDetailPage({super.key, required this.order});
 
   @override
   State<OrderDetailPage> createState() => _OrderDetailPageState();
@@ -44,7 +44,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           children: [
             _buildCard(
               'Müşteri Adı:',
-              widget.order.customerName,
+              "${UserService.user!.name} ${UserService.user!.surname}",
               Colors.black,
               FontWeight.bold,
             ),
@@ -129,20 +129,31 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       buttonColor: Colors.blue.shade400,
                       fontSize: 15,
                       textColor: Colors.white,
-                      onPressed: () {
-                        CommentItems.items.add({
-                          widget.order.id: Comment(
-                            commentController.text,
-                            star,
-                            DateTime.now(),
-                          ),
+                      onPressed: () async {
+                        CommentService.addComment(
+                          star,
+                          commentController.text.trim(),
+                          widget.order.id,
+                        ).then((response) {
+                          if (response.statusCode == 201) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Yorum eklendi"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          } else {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Hata: Yorum eklenemedi"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          }
                         });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Yorum eklendi"),
-                            showCloseIcon: true,
-                          ),
-                        );
+
                         setState(() {
                           star = 0;
                         });

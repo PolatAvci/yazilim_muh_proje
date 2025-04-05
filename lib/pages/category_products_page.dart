@@ -1,31 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/product.dart';
-import 'package:yazilim_muh_proje/Models/product_items.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:yazilim_muh_proje/pages/product_detail_page.dart';
 
-class CategoryProductsPage extends StatelessWidget {
-  final String category;
-  final int userId;
+class CategoryProductsPage extends StatefulWidget {
+  final int category;
 
-  const CategoryProductsPage({
-    super.key,
-    required this.category,
-    required this.userId,
-  });
+  const CategoryProductsPage({super.key, required this.category});
+
+  @override
+  State<CategoryProductsPage> createState() => _CategoryProductsPageState();
+}
+
+class _CategoryProductsPageState extends State<CategoryProductsPage> {
+  List<dynamic> _products = [];
+  String categoryname = "";
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    getCategoryName();
+    fetchCategoryProducts();
+  }
+
+  Future<void> getCategoryName() async {
+    final response = await http.get(
+      Uri.parse('https://localhost:7212/api/Category/${widget.category}'),
+    );
+    if (response.statusCode == 200) {
+      categoryname = json.decode(response.body)["name"];
+    }
+  }
+
+  Future<void> fetchCategoryProducts() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'https://localhost:7212/api/ProductCategory/${widget.category}',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _products = data;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Product> products = ProductItems.items;
-    List<Product> categoryProducts = [];
-    for (var product in products) {
-      if (product.category.toLowerCase() == category.toLowerCase()) {
-        categoryProducts.add(product);
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(category, style: TextStyle(color: Colors.white)),
+        title: Text(categoryname, style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue.shade400,
         leading: IconButton(
           onPressed: () {
@@ -35,90 +73,90 @@ class CategoryProductsPage extends StatelessWidget {
         ),
       ),
       body:
-          categoryProducts.isEmpty
+          isLoading
+              ? Center(child: CircularProgressIndicator()) // Yükleme animasyonu
+              : _products.isEmpty
               ? Center(
                 child: Text(
                   "Bu kategoride ürün bulunmamaktadır",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
                   textAlign: TextAlign.center,
                 ),
               )
               : GridView.builder(
-                itemCount: categoryProducts.length,
+                itemCount: _products.length,
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 300,
                 ),
-                itemBuilder:
-                    (context, index) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            10,
-                          ), // Sadece Card içinde borderRadius
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => ProductDetailPage(
-                                      id: categoryProducts[index].id,
-                                      userId: userId,
-                                      name: categoryProducts[index].name,
-                                      category:
-                                          categoryProducts[index].category,
-                                      details: categoryProducts[index].details,
-                                      imagePath: categoryProducts[index].image,
-                                      price: categoryProducts[index].price,
+                itemBuilder: (context, index) {
+                  var product = _products[index]["product"];
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ProductDetailPage(
+                                    id: product['id'],
+                                    name: product['name'],
+                                    details: product['details'],
+                                    imagePath: product['image'],
+                                    price: product['price'],
+                                  ),
+                            ),
+                          );
+                        },
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                product['image'] ?? '',
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                                height: double.infinity,
+                                errorBuilder:
+                                    (context, error, stackTrace) => Icon(
+                                      Icons.image_not_supported,
+                                      size: 50,
                                     ),
                               ),
-                            );
-                          },
-                          child: Stack(
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  10,
-                                ), // Resmin de köşelerinin yuvarlak olması için
-                                child: Image.asset(
-                                  categoryProducts[index].image,
-                                  fit: BoxFit.contain,
-                                  width: double.infinity,
-                                  height: double.infinity,
+                            ),
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade400,
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
                                 ),
                               ),
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Colors.blue.shade400, // Arka plan rengi
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(10),
-                                    bottomRight: Radius.circular(10),
-                                  ),
+                              child: Text(
+                                product['name'] ?? '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
-                                child: Text(
-                                  categoryProducts[index].name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                  );
+                },
               ),
     );
   }

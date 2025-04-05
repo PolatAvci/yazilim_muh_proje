@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/veriler.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'package:yazilim_muh_proje/components/button.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 import 'package:yazilim_muh_proje/Models/user.dart';
@@ -13,6 +13,7 @@ class RegisterPage extends StatelessWidget {
   final _repassword = TextEditingController();
   final _name = TextEditingController();
   final _surname = TextEditingController();
+  final _username = TextEditingController();
 
   bool _isValidEmail(String email) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
@@ -99,6 +100,15 @@ class RegisterPage extends StatelessWidget {
                           ),
                         ],
                       ),
+                      CustomTextField(
+                        label: "Kullanıcı Adı",
+                        onChanged: (username) {
+                          _username.text = username;
+                        },
+                        controller: _email,
+                        hint: "Kullanıcı Adı",
+                      ),
+                      SizedBox(height: 10),
                       CustomTextField(
                         label: "E-posta",
                         onChanged: (email) {
@@ -212,18 +222,33 @@ class RegisterPage extends StatelessWidget {
                           //Hata yoksa
                           // Create User object
                           User newUser = User(
-                            email: _email.text,
-                            password: _password.text,
+                            email: _email.text.trim(),
+                            password: _password.text.trim(),
+                            name: _name.text.trim(),
+                            surname: _surname.text.trim(),
+                            id: 0, // rastgele id veri tabanına gönderilmeyecek orada otomatik oluşturulacak
+                            username: _username.text.trim(),
                           );
                           // Add the new user to the list
-                          Veriler.kullanicilar.add(newUser);
-                          // Navigate to the KullanimKosullariPage
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginWithEmailPage(),
-                            ),
-                          );
+                          UserService.register(newUser).then((response) {
+                            if (!context.mounted) return;
+                            if (response.statusCode == 201) {
+                              // Navigate to the LoginWithEmailPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginWithEmailPage(),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Hata: Kayıt olunamadı"),
+                                  showCloseIcon: true,
+                                ),
+                              );
+                            }
+                          });
                         },
                       ),
                     ],

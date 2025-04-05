@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/product.dart';
-import 'package:yazilim_muh_proje/Models/product_items.dart';
-import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
+import 'package:yazilim_muh_proje/Services/product_service.dart';
 
 class FavoritePage extends StatefulWidget {
   final int userId;
@@ -13,9 +11,25 @@ class FavoritePage extends StatefulWidget {
 }
 
 class _FavoritePageState extends State<FavoritePage> {
+  List<dynamic>? _favProducts = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    ProductService.getAllFav(widget.userId).then((value) {
+      setState(() {
+        _favProducts = value;
+      });
+      if (_favProducts == null) {
+        throw Exception("Hata");
+      }
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<int> favItemsId = UserFavItems.getAllValuesByUserId(widget.userId);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -35,32 +49,21 @@ class _FavoritePageState extends State<FavoritePage> {
         ),
       ),
       body:
-          favItemsId.isEmpty
+          _isLoading
+              ? Center(child: CircularProgressIndicator()) // Yükleme animasyonu
+              : _favProducts!.isEmpty
               ? Center(
                 child: Text(
                   "Henüz favori ürün eklemediniz",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               )
               : ListView.builder(
-                itemCount: favItemsId.length,
+                itemCount: _favProducts!.length,
                 itemBuilder: (context, i) {
-                  // ID'ye göre favori ürünleri filtreliyoruz
-                  var item = ProductItems.items.firstWhere(
-                    (product) => product.id == favItemsId[i],
-                    orElse:
-                        () => Product(
-                          id: 0,
-                          category: "",
-                          details: "",
-                          name: "",
-                          price: 0,
-                          image: "",
-                        ),
-                  );
+                  var item = _favProducts![i]["product"];
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 10,
@@ -73,7 +76,15 @@ class _FavoritePageState extends State<FavoritePage> {
                           children: [
                             SizedBox(
                               width: 100,
-                              child: Image.asset(item.image, fit: BoxFit.cover),
+                              child: Image.network(
+                                item['image'] ?? '',
+                                fit: BoxFit.cover,
+                                errorBuilder:
+                                    (context, error, stackTrace) => Icon(
+                                      Icons.image_not_supported,
+                                      size: 50,
+                                    ),
+                              ),
                             ),
                             SizedBox(width: 15),
                             Padding(
@@ -84,7 +95,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: Text(
-                                      item.name,
+                                      item['name'] ?? '',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
@@ -93,7 +104,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    "\$${item.price}",
+                                    "\$${item['price']}",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -112,14 +123,12 @@ class _FavoritePageState extends State<FavoritePage> {
                                     builder:
                                         (context) => AlertDialog(
                                           title: Text(
-                                            "${item.name} favorilerden çıkarılsın mı?",
+                                            "${item['name']} favorilerden çıkarılsın mı?",
                                           ),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
-                                                Navigator.pop(
-                                                  context,
-                                                ); //Dialog'u kapatmak için
+                                                Navigator.pop(context);
                                               },
                                               child: Text(
                                                 "İptal",
@@ -130,30 +139,24 @@ class _FavoritePageState extends State<FavoritePage> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                setState(() {
-                                                  Navigator.pop(
-                                                    context,
-                                                  ); //Dialog'u kapatmak için
-                                                  // Favorilerden çıkarma işlemi
-                                                  UserFavItems.removeFavorite(
+                                                ProductService.removeFav(
+                                                  widget.userId,
+                                                  item["id"],
+                                                ).then((_) {
+                                                  ProductService.getAllFav(
                                                     widget.userId,
-                                                    item.id,
-                                                  );
-                                                  favItemsId =
-                                                      UserFavItems.getAllValuesByUserId(
-                                                        widget.userId,
-                                                      );
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        "Ürün favorilerden kaldırıldı.",
-                                                      ),
-                                                      showCloseIcon: true,
-                                                    ),
-                                                  );
+                                                  ).then((value) {
+                                                    setState(() {
+                                                      _favProducts = value;
+                                                    });
+                                                    if (_favProducts == null) {
+                                                      throw Exception("Hata");
+                                                    }
+                                                    _isLoading = false;
+                                                  });
                                                 });
+
+                                                Navigator.pop(context);
                                               },
                                               child: Text(
                                                 "Onayla",

@@ -1,30 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/comment_items.dart';
+import 'package:yazilim_muh_proje/Models/comment.dart';
+import 'package:yazilim_muh_proje/Services/comment_service.dart';
 
-class StarIndicator extends StatelessWidget {
+class StarIndicator extends StatefulWidget {
   final int productId;
 
   const StarIndicator({super.key, required this.productId});
 
-  double getAverageRating(int productId) {
-    List<int> ratings =
-        CommentItems.items
-            .where((item) => item.containsKey(productId))
-            .map((item) => item[productId]!.star)
-            .toList();
+  @override
+  State<StarIndicator> createState() => _StarIndicatorState();
+}
 
-    if (ratings.isEmpty) return 0.0;
-    int sum = 0;
-    for (int i in ratings) {
-      sum += i;
+class _StarIndicatorState extends State<StarIndicator> {
+  double _averageRating = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAverageRating();
+  }
+
+  @override
+  void didUpdateWidget(covariant StarIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    setState(() {});
+  }
+
+  Future<void> fetchAverageRating() async {
+    final List<Comment> comments = await CommentService.getComments(
+      widget.productId,
+    );
+
+    if (comments.isNotEmpty) {
+      double sum = comments
+          .map((comment) => comment.star)
+          .fold(0, (prev, star) => prev + star);
+      double average = sum / comments.length;
+
+      setState(() {
+        _averageRating = average;
+      });
     }
-    return sum / ratings.length;
   }
 
   @override
   Widget build(BuildContext context) {
-    double averageRating = getAverageRating(productId);
-    double progress = averageRating / 5.0;
+    double progress = _averageRating / 5.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -43,7 +65,7 @@ class StarIndicator extends StatelessWidget {
               ),
             ),
             Text(
-              averageRating.toStringAsFixed(1),
+              _averageRating.toStringAsFixed(1),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],

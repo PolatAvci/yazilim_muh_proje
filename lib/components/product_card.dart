@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
+import 'package:yazilim_muh_proje/Services/Product_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
+import 'package:yazilim_muh_proje/pages/login_page.dart';
 
 class ProductCard extends StatefulWidget {
   final Widget image;
@@ -10,7 +12,6 @@ class ProductCard extends StatefulWidget {
   final String category;
   final String details;
   final String imagePath;
-  final int userId;
 
   const ProductCard({
     super.key,
@@ -22,7 +23,6 @@ class ProductCard extends StatefulWidget {
     required this.price,
     required this.onpressed,
     required this.imagePath,
-    required this.userId,
   });
 
   @override
@@ -30,27 +30,37 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  late List<int> _userFavsId; // initialize it later
-  late bool _isFav;
-
-  bool _getIsFav() {
-    _userFavsId = UserFavItems.getAllValuesByUserId(widget.userId);
-    for (int i = 0; i < _userFavsId.length; i++) {
-      if (_userFavsId[i] == widget.id) {
-        return true;
-      }
-    }
-    return false;
-  }
-
+  bool isFav = false;
   @override
   void initState() {
     super.initState();
+    if (UserService.user?.id != null) {
+      ProductService.getIsFav(UserService.user!.id, widget.id).then((value) {
+        setState(() {
+          isFav = value;
+        });
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (UserService.user?.id != null) {
+      ProductService.getIsFav(UserService.user.id, widget.id).then((value) {
+        setState(() {
+          isFav = value;
+        });
+      });
+    } else {
+      setState(() {
+        isFav = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    _isFav = _getIsFav();
     return InkWell(
       onTap: widget.onpressed,
       child: Padding(
@@ -77,34 +87,81 @@ class _ProductCardState extends State<ProductCard> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _isFav = !_isFav;
-                        });
-                        if (!_isFav) {
-                          UserFavItems.removeFavorite(widget.userId, widget.id);
-
+                      onPressed: () async {
+                        if (UserService.user?.id == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text("Ürün favorilerden çıkarıldı."),
+                              content: Text("Lütfen giriş yapınız!"),
                               showCloseIcon: true,
+                            ),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginPage(),
                             ),
                           );
                           return;
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Ürün favorilere eklendi."),
-                            showCloseIcon: true,
-                          ),
-                        );
-                        UserFavItems.items.add({widget.userId: widget.id});
+                        setState(() {
+                          isFav = !isFav;
+                        });
+
+                        if (isFav) {
+                          // Favoriye ekle
+                          final response = await ProductService.addFav(
+                            UserService.user.id,
+                            widget.id,
+                          );
+                          if (!context.mounted) {
+                            return; // Widget ağacında bulunmuyorsa
+                          }
+                          if (response.statusCode == 201) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün favorilere eklendi."),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Favoriye eklenirken bir hata oluştu.",
+                                ),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          }
+                        } else {
+                          // Favorilerden çıkar
+                          final response = await ProductService.removeFav(
+                            UserService.user.id,
+                            widget.id,
+                          );
+                          if (!context.mounted) return;
+                          if (response.statusCode == 204) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün favorilerden çıkarıldı."),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Favorilerden çıkarılırken bir hata oluştu.",
+                                ),
+                                showCloseIcon: true,
+                              ),
+                            );
+                          }
+                        }
                       },
                       icon: Icon(
-                        _isFav
-                            ? Icons.favorite
-                            : Icons.favorite_border_outlined,
-                        color: _isFav ? Colors.red : Colors.grey,
+                        isFav ? Icons.favorite : Icons.favorite_border_outlined,
+                        color: isFav ? Colors.red : Colors.grey,
                       ),
                     ),
                   ],

@@ -21,6 +21,17 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<TrakStoreDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+// CORS yapılandırması
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()  // Bütün origin'lere izin verir
+               .AllowAnyMethod()  // Bütün HTTP metodlarına izin verir
+               .AllowAnyHeader(); // Bütün header'lara izin verir
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,6 +44,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// CORS'u kullanmaya başla
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

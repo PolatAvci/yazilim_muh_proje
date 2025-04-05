@@ -1,20 +1,20 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
-import 'package:yazilim_muh_proje/Models/comment_items.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
-import 'package:yazilim_muh_proje/Models/user_fav_items.dart';
-import 'package:yazilim_muh_proje/Models/veriler.dart';
+import 'package:yazilim_muh_proje/Services/comment_service.dart';
+import 'package:yazilim_muh_proje/Services/user_service.dart';
+import 'package:yazilim_muh_proje/components/comment_box.dart';
 import 'package:yazilim_muh_proje/pages/all_comment_page.dart';
 import 'package:yazilim_muh_proje/pages/cart_page.dart';
-import 'package:yazilim_muh_proje/pages/payment_page.dart';
-import 'package:intl/intl.dart';
+import 'package:yazilim_muh_proje/pages/login_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int id;
-  final int userId;
   final String name;
-  final String category;
   final String details;
   final String imagePath;
   final double price;
@@ -22,9 +22,7 @@ class ProductDetailPage extends StatefulWidget {
   const ProductDetailPage({
     super.key,
     required this.id,
-    required this.userId,
     required this.name,
-    required this.category,
     required this.details,
     required this.imagePath,
     required this.price,
@@ -35,24 +33,76 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  late bool _isFav;
-  late List<Comment> productComments;
+  bool _isFav = false;
+  List<Comment> productComments = [];
+  List<dynamic> userFavItem = [];
+
+  _isFavItem() {
+    for (var item in userFavItem) {
+      if (item["product"]["id"] == widget.id) {
+        setState(() {
+          _isFav = true;
+        });
+        return;
+      }
+    }
+    _isFav = false;
+  }
+
+  Future<void> _getAllUserFavItems() async {
+    final response = await http.get(
+      Uri.parse(
+        "https://localhost:7212/api/UserFavItem/${UserService.user!.id}",
+      ),
+    );
+    if (response.statusCode == 200) {
+      userFavItem = json.decode(response.body);
+    }
+  }
+
+  Future<void> _removeFav() async {
+    await http.delete(
+      Uri.parse(
+        "https://localhost:7212/api/UserFavItem/${UserService.user!.id}/${widget.id}",
+      ),
+    );
+    _getAllUserFavItems();
+  }
+
+  Future<void> _addFav() async {
+    await http.post(
+      Uri.parse("https://localhost:7212/api/UserFavItem"),
+      headers: {
+        'Content-Type':
+            'application/json', // JSON formatında veri gönderildiğini belirt
+      },
+      body: json.encode({
+        "userId": UserService.user!.id,
+        "productId": widget.id,
+      }),
+    );
+    _getAllUserFavItems();
+  }
 
   @override
   void initState() {
     super.initState();
-    List<int> favItems = UserFavItems.getAllValuesByUserId(widget.userId);
-    _isFav = favItems.contains(widget.id);
-    productComments =
-        CommentItems.items
-            .where((map) => map.containsKey(widget.id))
-            .map((map) => map[widget.id]!)
-            .toList();
+    if (UserService.user?.id != null) {
+      _getAllUserFavItems().then((_) => _isFavItem());
+    }
+    CommentService.getComments(widget.id).then((value) {
+      setState(() {
+        productComments = value;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<int> favItems = UserFavItems.getAllValuesByUserId(widget.userId);
+    List<int> favItems = [];
+    for (var item in userFavItem) {
+      favItems.add(item["product"]["id"]);
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue.shade400,
@@ -66,18 +116,37 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         actions: [
           IconButton(
             onPressed: () {
+              if (UserService.user?.id == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Lütfen giriş yapın"),
+                    showCloseIcon: true,
+                  ),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+                return;
+              }
               setState(() {
                 if (favItems.contains(widget.id)) {
-                  UserFavItems.removeFavorite(widget.userId, widget.id);
+                  _removeFav();
                   _isFav = false;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Ürün favorilerden çıkarıldı")),
+                    SnackBar(
+                      content: Text("Ürün favorilerden çıkarıldı"),
+                      showCloseIcon: true,
+                    ),
                   );
                 } else {
-                  UserFavItems.items.add({widget.userId: widget.id});
+                  _addFav();
                   _isFav = true;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Ürün favorilere eklendi")),
+                    SnackBar(
+                      content: Text("Ürün favorilere eklendi"),
+                      showCloseIcon: true,
+                    ),
                   );
                 }
               });
@@ -89,6 +158,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
           IconButton(
             onPressed: () {
+              if (UserService.user?.id == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Lütfen giriş yapın"),
+                    showCloseIcon: true,
+                  ),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+                return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => CartPage()),
@@ -125,7 +207,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "Kategori: ${widget.category}",
+                    "Kategori: Sonra eklenecek",
                     style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                   ),
                   SizedBox(height: 8),
@@ -285,12 +367,28 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
+                          if (UserService.user?.id == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Lütfen giriş yapın"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ),
+                            );
+                            return;
+                          }
                           if (CartItems.items.any(
                             (product) => product.id == widget.id,
                           )) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Ürün sepetinizde zaten var"),
+                                showCloseIcon: true,
                               ),
                             );
                             return;
@@ -298,15 +396,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           CartItems.items.add(
                             Product(
                               id: widget.id,
-                              category: widget.category,
                               details: widget.details,
                               name: widget.name,
                               price: widget.price,
                               image: widget.imagePath,
+                              productCategories: [], //ŞİMDİLİK BOŞ
                             ),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Ürün sepete eklendi")),
+                            SnackBar(
+                              content: Text("Ürün sepete eklendi"),
+                              showCloseIcon: true,
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -319,15 +420,51 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                       ElevatedButton(
                         onPressed: () {
+                          if (UserService.user?.id == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Lütfen giriş yapın"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ),
+                            );
+                            return;
+                          }
+                          if (CartItems.items.any(
+                            (product) => product.id == widget.id,
+                          )) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Ürün sepetinizde zaten var"),
+                                showCloseIcon: true,
+                              ),
+                            );
+                            return;
+                          }
+                          CartItems.items.add(
+                            Product(
+                              id: widget.id,
+                              details: widget.details,
+                              name: widget.name,
+                              price: widget.price,
+                              image: widget.imagePath,
+                              productCategories: [], //ŞİMDİLİK BOŞ
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Ürün sepete eklendi"),
+                              showCloseIcon: true,
+                            ),
+                          );
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => PaymentPage(
-                                    shippingCost: 20.0,
-                                    items: CartItems.items,
-                                  ),
-                            ),
+                            MaterialPageRoute(builder: (context) => CartPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -341,6 +478,68 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ],
                   ),
                   Divider(),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Yorumlar",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (productComments.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Bu ürüne henüz yorum yapılmamış.",
+                                  ),
+                                  showCloseIcon: true,
+                                ),
+                              );
+                              return;
+                            }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => AllCommentPage(id: widget.id),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            "Tümünü gör",
+                            style: TextStyle(color: Colors.blue.shade400),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  productComments.isEmpty
+                      ? Text("Bu ürüne henüz yorum yapılmamış")
+                      : SizedBox(
+                        height: 140,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount:
+                              productComments.length >= 5
+                                  ? 5
+                                  : productComments.length,
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (context, i) {
+                            return CommentBox(
+                              text: productComments[i].text,
+                              star: productComments[i].star,
+                              date: productComments[i].date,
+                            );
+                          },
+                        ),
+                      ),
                 ],
               ),
             ),
