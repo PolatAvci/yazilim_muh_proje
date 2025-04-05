@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:yazilim_muh_proje/Services/user_service.dart';
 import 'dart:convert';
 import 'package:yazilim_muh_proje/pages/category_products_page.dart';
 
 class CategoryPage extends StatefulWidget {
-  bool isLoading = true;
-  CategoryPage({super.key});
+  const CategoryPage({super.key});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
 }
 
 class _CategoryPageState extends State<CategoryPage> {
+  bool isLoading = true;
   List<Map<String, dynamic>> _categories = [];
 
   @override
@@ -22,20 +21,16 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Future<void> fetchCategories() async {
-    try {
-      final response = await http.get(
-        Uri.parse('https://localhost:7212/api/Category'),
-      );
+    final response = await http.get(
+      Uri.parse('https://localhost:7212/api/Category'),
+    );
 
-      if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(response.body);
-        setState(() {
-          _categories = List<Map<String, dynamic>>.from(data);
-          widget.isLoading = false;
-        });
-      }
-    } catch (e) {
-      print("Hata: $e");
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        _categories = List<Map<String, dynamic>>.from(data);
+        isLoading = false;
+      });
     }
   }
 
@@ -53,7 +48,7 @@ class _CategoryPageState extends State<CategoryPage> {
         backgroundColor: Colors.blue.shade400,
       ),
       body:
-          widget.isLoading
+          isLoading
               ? Center(child: CircularProgressIndicator())
               : _categories.isEmpty
               ? Center(
@@ -74,7 +69,6 @@ class _CategoryPageState extends State<CategoryPage> {
                         MaterialPageRoute(
                           builder:
                               (context) => CategoryProductsPage(
-                                userId: UserService.user!.id,
                                 category: category['id'],
                               ),
                         ),

@@ -52,7 +52,7 @@ class CommentService {
   static Future<List<Comment>> getComments(int productId) async {
     final List<Comment> comments = [];
     final response = await http.get(
-      Uri.parse("https://localhost:7212/api/CommentProduct/${productId}"),
+      Uri.parse("https://localhost:7212/api/CommentProduct/$productId"),
     );
 
     if (response.statusCode == 200) {

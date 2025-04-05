@@ -231,6 +231,7 @@ class RegisterPage extends StatelessWidget {
                           );
                           // Add the new user to the list
                           UserService.register(newUser).then((response) {
+                            if (!context.mounted) return;
                             if (response.statusCode == 201) {
                               // Navigate to the LoginWithEmailPage
                               Navigator.push(

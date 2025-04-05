@@ -17,11 +17,8 @@ class ProductDetailPage extends StatefulWidget {
   final String details;
   final String imagePath;
   final double price;
-  bool _isFav = false;
-  List<Comment> productComments = [];
-  List<dynamic> userFavItem = [];
 
-  ProductDetailPage({
+  const ProductDetailPage({
     super.key,
     required this.id,
     required this.name,
@@ -35,16 +32,20 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
+  bool _isFav = false;
+  List<Comment> productComments = [];
+  List<dynamic> userFavItem = [];
+
   _isFavItem() {
-    for (var item in widget.userFavItem) {
+    for (var item in userFavItem) {
       if (item["product"]["id"] == widget.id) {
         setState(() {
-          widget._isFav = true;
+          _isFav = true;
         });
         return;
       }
     }
-    widget._isFav = false;
+    _isFav = false;
   }
 
   Future<void> _getAllUserFavItems() async {
@@ -54,12 +55,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       ),
     );
     if (response.statusCode == 200) {
-      widget.userFavItem = json.decode(response.body);
+      userFavItem = json.decode(response.body);
     }
   }
 
   Future<void> _removeFav() async {
-    final response = await http.delete(
+    await http.delete(
       Uri.parse(
         "https://localhost:7212/api/UserFavItem/${UserService.user!.id}/${widget.id}",
       ),
@@ -68,7 +69,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> _addFav() async {
-    final response = await http.post(
+    await http.post(
       Uri.parse("https://localhost:7212/api/UserFavItem"),
       headers: {
         'Content-Type':
@@ -90,7 +91,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     }
     CommentService.getComments(widget.id).then((value) {
       setState(() {
-        widget.productComments = value;
+        productComments = value;
       });
     });
   }
@@ -98,7 +99,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     List<int> favItems = [];
-    for (var item in widget.userFavItem) {
+    for (var item in userFavItem) {
       favItems.add(item["product"]["id"]);
     }
     return Scaffold(
@@ -130,7 +131,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               setState(() {
                 if (favItems.contains(widget.id)) {
                   _removeFav();
-                  widget._isFav = false;
+                  _isFav = false;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text("Ürün favorilerden çıkarıldı"),
@@ -139,7 +140,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   );
                 } else {
                   _addFav();
-                  widget._isFav = true;
+                  _isFav = true;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text("Ürün favorilere eklendi"),
@@ -150,7 +151,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               });
             },
             icon:
-                widget._isFav
+                _isFav
                     ? Icon(Icons.favorite, color: Colors.red)
                     : Icon(Icons.favorite_border, color: Colors.white),
           ),
@@ -355,7 +356,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                         TextButton(
                           onPressed: () {
-                            if (widget.productComments.isEmpty) {
+                            if (productComments.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -382,23 +383,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ],
                     ),
                   ),
-                  widget.productComments.isEmpty
+                  productComments.isEmpty
                       ? Text("Bu ürüne henüz yorum yapılmamış")
                       : SizedBox(
                         height: 140,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount:
-                              widget.productComments.length >= 5
+                              productComments.length >= 5
                                   ? 5
-                                  : widget.productComments.length,
+                                  : productComments.length,
                           shrinkWrap: true,
                           physics: BouncingScrollPhysics(),
                           itemBuilder: (context, i) {
                             return CommentBox(
-                              text: widget.productComments[i].text,
-                              star: widget.productComments[i].star,
-                              date: widget.productComments[i].date,
+                              text: productComments[i].text,
+                              star: productComments[i].star,
+                              date: productComments[i].date,
                             );
                           },
                         ),

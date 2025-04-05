@@ -8,7 +8,7 @@ class StarIndicator extends StatefulWidget {
   const StarIndicator({super.key, required this.productId});
 
   @override
-  _StarIndicatorState createState() => _StarIndicatorState();
+  State<StarIndicator> createState() => _StarIndicatorState();
 }
 
 class _StarIndicatorState extends State<StarIndicator> {

@@ -11,22 +11,21 @@ import 'package:yazilim_muh_proje/pages/orders_page.dart.dart';
 import 'package:yazilim_muh_proje/pages/product_detail_page.dart';
 
 class HomePage extends StatefulWidget {
-  List<Map<String, dynamic>>? products = [];
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Map<String, dynamic>>? products = [];
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     ProductService.getProducts().then((value) {
       setState(() {
-        widget.products = value;
+        products = value;
       });
     });
   }
@@ -92,20 +91,6 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context);
               },
             ),
-            UserService.user?.id != null
-                ? SizedBox()
-                : ListTile(
-                  leading: Icon(Icons.login, color: Colors.blue.shade400),
-                  title: Text("Giriş Yap / Kayıt ol"),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
-                    ).then((_) {
-                      setState(() {});
-                    });
-                  },
-                ),
             UserService.user?.id == null
                 ? SizedBox()
                 : ListTile(
@@ -122,7 +107,6 @@ class _HomePageState extends State<HomePage> {
                     ).then((_) {
                       setState(() {});
                     });
-                    ;
                   },
                 ),
             UserService.user?.id == null
@@ -138,7 +122,6 @@ class _HomePageState extends State<HomePage> {
                     ).then((_) {
                       setState(() {});
                     });
-                    ;
                   },
                 ),
             UserService.user?.id == null
@@ -160,20 +143,31 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                 ),
-            UserService.user?.id == null
+            ListTile(
+              leading: Icon(Icons.category, color: Colors.blue.shade400),
+              title: Text('Kategoriler'),
+              onTap: () {
+                Navigator.pop(context); // Drawer kapatmak için
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CategoryPage()),
+                ).then((_) {
+                  setState(() {});
+                });
+              },
+            ),
+            UserService.user?.id != null
                 ? SizedBox()
                 : ListTile(
-                  leading: Icon(Icons.category, color: Colors.blue.shade400),
-                  title: Text('Kategoriler'),
+                  leading: Icon(Icons.login, color: Colors.blue.shade400),
+                  title: Text("Giriş Yap / Kayıt ol"),
                   onTap: () {
-                    Navigator.pop(context); // Drawer kapatmak için
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CategoryPage()),
+                      MaterialPageRoute(builder: (context) => LoginPage()),
                     ).then((_) {
                       setState(() {});
                     });
-                    ;
                   },
                 ),
             UserService.user?.id == null ? SizedBox() : Divider(),
@@ -183,10 +177,10 @@ class _HomePageState extends State<HomePage> {
                   leading: Icon(Icons.exit_to_app, color: Colors.blue.shade400),
                   title: Text("Oturumu kapat"),
                   onTap: () {
+                    Navigator.pop(context);
                     setState(() {
                       UserService.logout();
                     });
-                    Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("Başarıyla çıkış yapıldı"),
@@ -249,15 +243,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body:
-          widget.products!.isEmpty
+          products!.isEmpty
               ? Center(child: CircularProgressIndicator())
               : SizedBox(
                 height: 350,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: widget.products!.length,
+                  itemCount: products!.length,
                   itemBuilder: (context, i) {
-                    var item = widget.products![i];
+                    var item = products![i];
                     return SizedBox(
                       width: 200,
                       child: ProductCard(

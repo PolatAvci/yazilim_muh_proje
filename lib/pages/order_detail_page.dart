@@ -136,6 +136,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           widget.order.id,
                         ).then((response) {
                           if (response.statusCode == 201) {
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Yorum eklendi"),
@@ -143,6 +144,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                             );
                           } else {
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("Hata: Yorum eklenemedi"),

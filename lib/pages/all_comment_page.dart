@@ -9,7 +9,7 @@ class AllCommentPage extends StatefulWidget {
   const AllCommentPage({super.key, required this.id});
 
   @override
-  _AllCommentPageState createState() => _AllCommentPageState();
+  State<AllCommentPage> createState() => _AllCommentPageState();
 }
 
 class _AllCommentPageState extends State<AllCommentPage> {

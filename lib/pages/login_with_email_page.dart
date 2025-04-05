@@ -79,6 +79,7 @@ class _LoginWithEmailPageState extends State<LoginWithEmailPage> {
         _emailComtroller.text.trim(),
         _passwordController.text.trim(),
       ).then((user) {
+        if (!mounted) return;
         if (user != null) {
           Navigator.push(
             context,

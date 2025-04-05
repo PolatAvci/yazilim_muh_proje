@@ -12,9 +12,8 @@ class ProductCard extends StatefulWidget {
   final String category;
   final String details;
   final String imagePath;
-  bool isFav = false;
 
-  ProductCard({
+  const ProductCard({
     super.key,
     required this.id,
     required this.category,
@@ -31,13 +30,14 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
+  bool isFav = false;
   @override
   void initState() {
     super.initState();
     if (UserService.user?.id != null) {
       ProductService.getIsFav(UserService.user!.id, widget.id).then((value) {
         setState(() {
-          widget.isFav = value;
+          isFav = value;
         });
       });
     }
@@ -49,8 +49,12 @@ class _ProductCardState extends State<ProductCard> {
     if (UserService.user?.id != null) {
       ProductService.getIsFav(UserService.user.id, widget.id).then((value) {
         setState(() {
-          widget.isFav = value;
+          isFav = value;
         });
+      });
+    } else {
+      setState(() {
+        isFav = false;
       });
     }
   }
@@ -100,16 +104,18 @@ class _ProductCardState extends State<ProductCard> {
                           return;
                         }
                         setState(() {
-                          widget.isFav = !widget.isFav;
+                          isFav = !isFav;
                         });
 
-                        if (widget.isFav) {
+                        if (isFav) {
                           // Favoriye ekle
                           final response = await ProductService.addFav(
                             UserService.user.id,
                             widget.id,
                           );
-
+                          if (!context.mounted) {
+                            return; // Widget ağacında bulunmuyorsa
+                          }
                           if (response.statusCode == 201) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -133,7 +139,7 @@ class _ProductCardState extends State<ProductCard> {
                             UserService.user.id,
                             widget.id,
                           );
-
+                          if (!context.mounted) return;
                           if (response.statusCode == 204) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -154,10 +160,8 @@ class _ProductCardState extends State<ProductCard> {
                         }
                       },
                       icon: Icon(
-                        widget.isFav
-                            ? Icons.favorite
-                            : Icons.favorite_border_outlined,
-                        color: widget.isFav ? Colors.red : Colors.grey,
+                        isFav ? Icons.favorite : Icons.favorite_border_outlined,
+                        color: isFav ? Colors.red : Colors.grey,
                       ),
                     ),
                   ],

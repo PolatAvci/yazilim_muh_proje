@@ -5,14 +5,8 @@ import 'package:yazilim_muh_proje/pages/product_detail_page.dart';
 
 class CategoryProductsPage extends StatefulWidget {
   final int category;
-  final int userId;
-  bool isLoading = true;
 
-  CategoryProductsPage({
-    super.key,
-    required this.category,
-    required this.userId,
-  });
+  const CategoryProductsPage({super.key, required this.category});
 
   @override
   State<CategoryProductsPage> createState() => _CategoryProductsPageState();
@@ -21,6 +15,7 @@ class CategoryProductsPage extends StatefulWidget {
 class _CategoryProductsPageState extends State<CategoryProductsPage> {
   List<dynamic> _products = [];
   String categoryname = "";
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -50,17 +45,16 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
         List<dynamic> data = json.decode(response.body);
         setState(() {
           _products = data;
-          widget.isLoading = false;
+          isLoading = false;
         });
       } else {
         setState(() {
-          widget.isLoading = false;
+          isLoading = false;
         });
       }
     } catch (e) {
-      print("Hata: $e");
       setState(() {
-        widget.isLoading = false;
+        isLoading = false;
       });
     }
   }
@@ -79,7 +73,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
         ),
       ),
       body:
-          widget.isLoading
+          isLoading
               ? Center(child: CircularProgressIndicator()) // Yükleme animasyonu
               : _products.isEmpty
               ? Center(

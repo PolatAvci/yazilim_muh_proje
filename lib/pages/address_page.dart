@@ -6,14 +6,14 @@ import 'package:yazilim_muh_proje/components/button.dart';
 import 'package:yazilim_muh_proje/components/custom_text_field.dart';
 
 class AddressPage extends StatefulWidget {
-  List<Address> adresler = [];
-  AddressPage({super.key});
+  const AddressPage({super.key});
 
   @override
   State<AddressPage> createState() => _AddressPageState();
 }
 
 class _AddressPageState extends State<AddressPage> {
+  List<Address> adresler = [];
   final _cityController = TextEditingController();
   final _addressController = TextEditingController();
 
@@ -25,10 +25,11 @@ class _AddressPageState extends State<AddressPage> {
         _addressController.text.trim(),
         _cityController.text.trim(),
       ).then((response) {
+        if (!mounted) return;
         if (response.statusCode == 201) {
           AddressService.getAddresses(UserService.user!.id).then((value) {
             setState(() {
-              widget.adresler = value;
+              adresler = value;
             });
           });
           ScaffoldMessenger.of(context).showSnackBar(
@@ -61,17 +62,19 @@ class _AddressPageState extends State<AddressPage> {
       response,
     ) {
       if (response.statusCode == 204) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Adres silindi'), showCloseIcon: true),
         );
         setState(() {
           AddressService.getAddresses(UserService.user!.id).then((value) {
             setState(() {
-              widget.adresler = value;
+              adresler = value;
             });
           });
         });
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Hata: Adres silinemedi'),
@@ -88,7 +91,7 @@ class _AddressPageState extends State<AddressPage> {
 
     AddressService.getAddresses(UserService.user!.id).then((value) {
       setState(() {
-        widget.adresler = value;
+        adresler = value;
       });
     });
   }
@@ -179,7 +182,7 @@ class _AddressPageState extends State<AddressPage> {
         ),
       ),
       body:
-          widget.adresler.isEmpty
+          adresler.isEmpty
               ? const Center(
                 child: Text(
                   "Adres bulunamadı",
@@ -191,9 +194,9 @@ class _AddressPageState extends State<AddressPage> {
                 ),
               )
               : ListView.builder(
-                itemCount: widget.adresler.length,
+                itemCount: adresler.length,
                 itemBuilder: (context, index) {
-                  final address = widget.adresler[index];
+                  final address = adresler[index];
                   return Row(
                     children: [
                       Expanded(
