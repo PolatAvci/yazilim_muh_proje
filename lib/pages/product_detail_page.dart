@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:yazilim_muh_proje/Models/cart_items.dart';
 import 'package:yazilim_muh_proje/Models/comment.dart';
 import 'package:yazilim_muh_proje/Models/product.dart';
@@ -226,6 +227,141 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   SizedBox(height: 8),
                   Text(widget.details, style: TextStyle(fontSize: 16)),
                   SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Yorumlar",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Spacer(),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              AllCommentPage(id: widget.id),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue.shade600,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Tüm Yorumları Gör",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+
+                  productComments.isNotEmpty
+                      ? SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children:
+                              productComments
+                                  .take(4)
+                                  .map(
+                                    (comment) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0,
+                                      ),
+                                      child: Card(
+                                        elevation: 4,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  SizedBox(width: 4),
+                                                  Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Icon(
+                                                            Icons.star,
+                                                            color:
+                                                                Colors
+                                                                    .yellow
+                                                                    .shade700,
+                                                          ),
+                                                          Text(comment.text),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        width: 8,
+                                                        height: 10,
+                                                      ),
+                                                      Container(
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              DateFormat(
+                                                                'dd/MM/yyyy',
+                                                              ).format(
+                                                                comment.date,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                        ),
+                      )
+                      : Text(
+                        "Henüz yorum yapılmadı.",
+                        style: TextStyle(fontSize: 16),
+                      ),
+
+                  SizedBox(height: 8),
+
+                  SizedBox(height: 20),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
