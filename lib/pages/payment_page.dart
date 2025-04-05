@@ -182,6 +182,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
         if (response.statusCode == 201) {
           CartItems.items.clear();
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text("Ödeme başarıyla tamamlandı!"),
