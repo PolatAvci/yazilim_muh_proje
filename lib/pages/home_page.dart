@@ -243,51 +243,118 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body:
-          products!.isEmpty
+          products == null
               ? Center(child: CircularProgressIndicator())
-              : SizedBox(
-                height: 350,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: products!.length,
-                  itemBuilder: (context, i) {
-                    var item = products![i];
-                    return SizedBox(
-                      width: 200,
-                      child: ProductCard(
-                        id: item["id"],
-                        category: "Sonra kaldırılacak",
-                        details: item["details"],
-                        imagePath: item["image"],
-                        image: SizedBox(
-                          height: 250,
-                          child: Image.asset(
-                            item["image"],
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        name: item["name"],
-                        price: item["price"],
-                        onpressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => ProductDetailPage(
-                                    id: item["id"],
-                                    name: item["name"],
-                                    details: item["details"],
-                                    imagePath: item["image"],
-                                    price: item["price"],
+              : Padding(
+                padding: EdgeInsets.all(10),
+                child: ListView(
+                  children: [
+                    Text(
+                      "Sizin için",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 350,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: products!.length > 5 ? 5 : products!.length,
+                        itemBuilder: (context, i) {
+                          var item = products![i];
+                          return SizedBox(
+                            width: 200,
+
+                            child: ProductCard(
+                              id: item["id"],
+                              category: "Sonra kaldırılacak",
+                              details: item["details"],
+                              imagePath: item["image"],
+                              image: SizedBox(
+                                height: 250,
+                                child: Image.asset(
+                                  item["image"],
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              name: item["name"],
+                              price: item["price"],
+                              onpressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => ProductDetailPage(
+                                          id: item["id"],
+                                          name: item["name"],
+                                          details: item["details"],
+                                          imagePath: item["image"],
+                                          price: item["price"],
+                                        ),
                                   ),
+                                ).then((value) {
+                                  setState(() {});
+                                });
+                              },
                             ),
-                          ).then((value) {
-                            setState(() {});
-                          });
+                          );
                         },
                       ),
-                    );
-                  },
+                    ),
+                    SizedBox(height: 30),
+                    Text(
+                      "Tüm ürünler",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: products!.length,
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 300,
+                        // childAspectRatio: 3 / 4,
+                      ),
+                      itemBuilder:
+                          (context, i) => SizedBox(
+                            height: 400,
+                            child: ProductCard(
+                              id: products![i]["id"],
+                              category: "Sonra kaldırılacak",
+                              details: products![i]["details"],
+                              imagePath: products![i]["image"],
+                              image: Image.asset(
+                                height: 150,
+                                products![i]["image"],
+                                fit: BoxFit.contain,
+                              ),
+                              name: products![i]["name"],
+                              price: products![i]["price"],
+                              onpressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => ProductDetailPage(
+                                          id: products![i]["id"],
+                                          name: products![i]["name"],
+                                          details: products![i]["details"],
+                                          imagePath: products![i]["image"],
+                                          price: products![i]["price"],
+                                        ),
+                                  ),
+                                ).then((value) {
+                                  setState(() {});
+                                });
+                              },
+                            ),
+                          ),
+                    ),
+                  ],
                 ),
               ),
     );
