@@ -317,7 +317,7 @@ class _HomePageState extends State<HomePage> {
                       itemCount: products!.length,
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 300,
-                        // childAspectRatio: 3 / 4,
+                        childAspectRatio: 3 / 4,
                       ),
                       itemBuilder:
                           (context, i) => SizedBox(
